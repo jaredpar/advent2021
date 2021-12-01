@@ -11,3 +11,11 @@ func TestCountIncreases(t *testing.T) {
 	}
 
 }
+
+func TestCountIncreasesWindow(t *testing.T) {
+	count := CountIncreasesWindow()
+	if count != 1653 {
+		t.Error("Incorrect count")
+	}
+
+}
