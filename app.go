@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	count := day02.CalcPart1()
+	count := day02.CalcPart2()
 	fmt.Printf("%d value\n", count)
 
 }

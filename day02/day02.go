@@ -95,6 +95,34 @@ func calcPosition(fileName string) int {
 	return position * depth
 }
 
+func calcPositionWithAim(fileName string) (position int, depth int, aim int) {
+	movements, err := readMovements(fileName)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, movement := range movements {
+		switch movement.direction {
+		case DirectionUp:
+			aim -= movement.value
+		case DirectionDown:
+			aim += movement.value
+		case DirectionForward:
+			position += movement.value
+			depth += aim * movement.value
+		default:
+			panic("bad enum")
+		}
+	}
+
+	return
+}
+
 func CalcPart1() int {
 	return calcPosition("input.txt")
+}
+
+func CalcPart2() int {
+	position, depth, _ := calcPositionWithAim("input.txt")
+	return position * depth
 }
