@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"advent2021.com/day01"
+	"advent2021.com/day02"
 )
 
 func main() {
-	count := day01.CountIncreasesWindow()
-	fmt.Printf("%d increases\n", count)
+	count := day02.CalcPart1()
+	fmt.Printf("%d value\n", count)
 
 }
