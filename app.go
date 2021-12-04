@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	count := day03.GetRatesValue("input.txt")
-	fmt.Printf("%d value\n", count)
-
+	result := day03.GetLifeSupportRatesValue("input.txt")
+	fmt.Printf("%d value\n", result)
 }

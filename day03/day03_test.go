@@ -12,3 +12,12 @@ func TestGetRatesSample(t *testing.T) {
 	}
 
 }
+
+func TestGetLifeSupportRatesSample(t *testing.T) {
+	result := GetLifeSupportRatesValue("sample.txt")
+
+	if result != 230 {
+		t.Errorf("Expected 230 but got %d", result)
+	}
+
+}
