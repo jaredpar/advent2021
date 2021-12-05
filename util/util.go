@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"embed"
 	"strconv"
+	"unicode"
 )
 
 func ReadLines(f embed.FS, name string) ([]string, error) {
@@ -40,4 +41,27 @@ func ReadLinesAsInt(f embed.FS, name string) ([]int, error) {
 	}
 
 	return values, nil
+}
+
+func SplitOnWhiteSpace(line string) []string {
+	startIndex := -1
+	items := make([]string, 0)
+	for index, r := range line {
+		if unicode.IsSpace(r) {
+			if startIndex >= 0 {
+				item := line[startIndex:index]
+				items = append(items, item)
+			}
+			startIndex = -1
+		} else if startIndex < 0 {
+			startIndex = index
+		}
+	}
+
+	if startIndex >= 0 {
+		item := line[startIndex:]
+		items = append(items, item)
+	}
+
+	return items
 }
