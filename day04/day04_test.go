@@ -28,12 +28,7 @@ func TestParsePuzzleSample(t *testing.T) {
 }
 
 func TsetRunPuzzleSample(t *testing.T) {
-	puzzle, err := parsePuzzle("sample.txt", 5)
-	if err != nil {
-		t.Error("cannot parse puzzle")
-	}
-
-	result := runPuzzle(puzzle)
+	result := GetFirstScoreFromFile("sample.txt", 5)
 	if result != 4512 {
 		t.Error("Bad value detected")
 	}

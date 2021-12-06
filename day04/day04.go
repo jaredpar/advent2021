@@ -184,40 +184,24 @@ func parsePuzzle(fileName string, sideSize int) (*puzzle, error) {
 	return newPuzzle(numbers, boards), nil
 }
 
-func runPuzzle(p *puzzle) int {
-
-	m := make(map[int]bool)
-	for _, current := range p.numbers {
-		m[current] = true
-		for _, b := range p.boards {
-			row, column := b.getSlotForValue(current)
-			if row >= 0 && b.checkWin(row, column, m) {
-				sum := 0
-				for _, value := range b.slots {
-					if _, found := m[value]; !found {
-						sum += value
-					}
-				}
-
-				return sum * current
-			}
-		}
-	}
-
-	return -1
+type boardResult struct {
+	board        board
+	winner       bool
+	winningValue int
+	score        int
 }
 
-func RunPuzzleFile(fileName string, sideSize int) int {
-	p, err := parsePuzzle(fileName, sideSize)
-	if err != nil {
-		panic(err)
-	}
-
-	return runPuzzle(p)
+func newBoardResult(board board, winner bool, winningValue int, score int) *boardResult {
+	return &boardResult{
+		board:        board,
+		winner:       winner,
+		winningValue: winningValue,
+		score:        score}
 }
 
-func runPuzzleLastWin(p *puzzle) int {
+func runPuzzle(p *puzzle) []*boardResult {
 
+	results := make([]*boardResult, 0, len(p.boards))
 	m := make(map[int]bool)
 	l := list.New()
 	for _, b := range p.boards {
@@ -235,30 +219,51 @@ func runPuzzleLastWin(p *puzzle) int {
 				n = n.Next()
 				l.Remove(temp)
 
-				if l.Len() == 1 {
-					sum := 0
-					for _, value := range b.slots {
-						if _, found := m[value]; !found {
-							sum += value
-						}
+				sum := 0
+				for _, value := range b.slots {
+					if _, found := m[value]; !found {
+						sum += value
 					}
-
-					return sum * current
 				}
+
+				score := sum * current
+				boardResult := newBoardResult(b, true, current, score)
+				results = append(results, boardResult)
 			} else {
 				n = n.Next()
 			}
 		}
 	}
 
-	return -1
+	for n := l.Front(); n != nil; n = n.Next() {
+		b := n.Value.(board)
+		r := newBoardResult(b, false, -1, -1)
+		results = append(results, r)
+	}
+
+	return results
 }
 
-func RunPuzzleFileLastWin(fileName string, sideSize int) int {
+func runPuzzleFile(fileName string, sideSize int) []*boardResult {
 	p, err := parsePuzzle(fileName, sideSize)
 	if err != nil {
 		panic(err)
 	}
 
-	return runPuzzleLastWin(p)
+	return runPuzzle(p)
+}
+
+func GetFirstScoreFromFile(fileName string, sideSize int) int {
+	boardResults := runPuzzleFile(fileName, sideSize)
+	return boardResults[0].score
+}
+
+func GetLastScoreFromFile(fileName string, sideSize int) int {
+	boardResults := runPuzzleFile(fileName, sideSize)
+	last := boardResults[len(boardResults)-1]
+	if !last.winner {
+		panic("last board is not a winner")
+	}
+
+	return last.score
 }

@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	result := day04.RunPuzzleFileLastWin("input.txt", 5)
+	result := day04.GetLastScoreFromFile("input.txt", 5)
 	fmt.Printf("%d value\n", result)
 }
