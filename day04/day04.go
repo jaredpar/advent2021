@@ -1,6 +1,7 @@
 package day04
 
 import (
+	"container/list"
 	"embed"
 	"errors"
 	"strconv"
@@ -20,6 +21,20 @@ type board struct {
 func newBoard(sideSize int) board {
 	slots := make([]int, sideSize*sideSize)
 	return board{slots: slots, sideSize: sideSize}
+}
+
+func (b board) getSlotForValue(value int) (row int, column int) {
+	for i, v := range b.slots {
+		if v == value {
+			row = i / b.sideSize
+			column = i % b.sideSize
+			return
+		}
+	}
+
+	row = -1
+	column = -1
+	return
 }
 
 func (b board) getSlot(row int, column int) int {
@@ -59,23 +74,25 @@ func (b board) checkWin(row int, column int, foundMap map[int]bool) bool {
 		return true
 	}
 
-	checkDiag := func() bool {
-		right := 0
-		left := 0
-		for i := 0; i < b.sideSize; i++ {
-			j := b.sideSize - i
-			if b.isSlotFound(i, i, foundMap) {
-				right++
+	/*
+		checkDiag := func() bool {
+			right := 0
+			left := 0
+			for i := 0; i < b.sideSize; i++ {
+				j := b.sideSize - i
+				if b.isSlotFound(i, i, foundMap) {
+					right++
+				}
+				if b.isSlotFound(j, j, foundMap) {
+					left++
+				}
 			}
-			if b.isSlotFound(j, j, foundMap) {
-				left++
-			}
+
+			return left == b.sideSize || right == b.sideSize
 		}
+	*/
 
-		return left == b.sideSize || right == b.sideSize
-	}
-
-	return checkColumn() || checkRow() || checkDiag()
+	return checkColumn() || checkRow()
 }
 
 func parseBoard(lines []string) (board, error) {
@@ -165,4 +182,83 @@ func parsePuzzle(fileName string, sideSize int) (*puzzle, error) {
 	}
 
 	return newPuzzle(numbers, boards), nil
+}
+
+func runPuzzle(p *puzzle) int {
+
+	m := make(map[int]bool)
+	for _, current := range p.numbers {
+		m[current] = true
+		for _, b := range p.boards {
+			row, column := b.getSlotForValue(current)
+			if row >= 0 && b.checkWin(row, column, m) {
+				sum := 0
+				for _, value := range b.slots {
+					if _, found := m[value]; !found {
+						sum += value
+					}
+				}
+
+				return sum * current
+			}
+		}
+	}
+
+	return -1
+}
+
+func RunPuzzleFile(fileName string, sideSize int) int {
+	p, err := parsePuzzle(fileName, sideSize)
+	if err != nil {
+		panic(err)
+	}
+
+	return runPuzzle(p)
+}
+
+func runPuzzleLastWin(p *puzzle) int {
+
+	m := make(map[int]bool)
+	l := list.New()
+	for _, b := range p.boards {
+		l.PushBack(b)
+	}
+
+	for _, current := range p.numbers {
+		m[current] = true
+
+		for n := l.Front(); n != nil; {
+			b := n.Value.(board)
+			row, column := b.getSlotForValue(current)
+			if row >= 0 && b.checkWin(row, column, m) {
+				temp := n
+				n = n.Next()
+				l.Remove(temp)
+
+				if l.Len() == 1 {
+					sum := 0
+					for _, value := range b.slots {
+						if _, found := m[value]; !found {
+							sum += value
+						}
+					}
+
+					return sum * current
+				}
+			} else {
+				n = n.Next()
+			}
+		}
+	}
+
+	return -1
+}
+
+func RunPuzzleFileLastWin(fileName string, sideSize int) int {
+	p, err := parsePuzzle(fileName, sideSize)
+	if err != nil {
+		panic(err)
+	}
+
+	return runPuzzleLastWin(p)
 }

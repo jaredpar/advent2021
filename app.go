@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"advent2021.com/day03"
+	"advent2021.com/day04"
 )
 
 func main() {
-	result := day03.GetLifeSupportRatesValue("input.txt")
+	result := day04.RunPuzzleFileLastWin("input.txt", 5)
 	fmt.Printf("%d value\n", result)
 }
