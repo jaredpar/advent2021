@@ -4,6 +4,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -18,6 +19,12 @@ type point struct {
 type line struct {
 	start point
 	end   point
+}
+
+func (l line) isDiagonal() bool {
+	rise := math.Abs(float64(l.end.y - l.start.y))
+	run := math.Abs(float64(l.end.x - l.start.x))
+	return 1 == int(rise/run)
 }
 
 func newLine(x1 int, y1 int, x2 int, y2 int) *line {
@@ -113,6 +120,30 @@ func newBoard(lines []*line) board {
 				index := b.getValueIndex(x, y)
 				b.values[index]++
 			}
+		} else if line.isDiagonal() {
+			xInc := 1
+			if line.start.x > line.end.x {
+				xInc = -1
+			}
+
+			yInc := 1
+			if line.start.y > line.end.y {
+				yInc = -1
+			}
+
+			p := line.start
+			for {
+				index := b.getValueIndex(p.x, p.y)
+				b.values[index]++
+
+				if p.x == line.end.x && p.y == line.end.y {
+					break
+				}
+
+				p.x += xInc
+				p.y += yInc
+
+			}
 		}
 	}
 
@@ -169,6 +200,15 @@ func readDiagram(fileName string) (*diagram, error) {
 	}
 
 	return parseDiagram(lines)
+}
+
+func GetDiagram(fileName string) string {
+	d, err := readDiagram(fileName)
+	if err != nil {
+		panic(err)
+	}
+
+	return d.board.String()
 }
 
 func GetOverlapCount() int {

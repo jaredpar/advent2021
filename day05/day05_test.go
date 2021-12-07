@@ -12,8 +12,8 @@ func TestOverlapCountOnSample(t *testing.T) {
 	}
 
 	count := d.board.getOverlapCount()
-	if count != 5 {
-		t.Error("Invalid count")
+	if count != 12 {
+		t.Errorf("expected 12 got %d", count)
 	}
 }
 
@@ -25,7 +25,8 @@ func TestOverlapCountOnInput(t *testing.T) {
 	}
 
 	count := d.board.getOverlapCount()
-	if count != 6841 {
-		t.Error("Invalid count")
+	expected := 19258
+	if count != expected {
+		t.Errorf("expected %d but got %d", expected, count)
 	}
 }

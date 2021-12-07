@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	result := day05.GetOverlapCount()
-	fmt.Printf("%d value\n", result)
+	result := day05.GetDiagram("sample.txt")
+	fmt.Println(result)
 }
