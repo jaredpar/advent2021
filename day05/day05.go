@@ -67,18 +67,33 @@ func parseLines(textLines []string) ([]*line, error) {
 	return lines, nil
 }
 
-const boardSize = 10
-
-type board []int
+type board struct {
+	values []int
+	size   int
+}
 
 // Get the index into a board for a given x and y position
-func getBoardIndex(x int, y int) int {
-	index := y * boardSize
+func (b board) getValueIndex(x int, y int) int {
+	index := y * b.size
 	return index + x
 }
 
+func (b board) getValue(x int, y int) int {
+	index := b.getValueIndex(x, y)
+	return b.values[index]
+}
+
 func newBoard(lines []*line) board {
-	values := make([]int, boardSize*boardSize)
+	size := 0
+	for _, line := range lines {
+		size = util.Max(size, line.start.x)
+		size = util.Max(size, line.start.y)
+		size = util.Max(size, line.end.x)
+		size = util.Max(size, line.end.y)
+	}
+
+	size += 1
+	b := board{values: make([]int, size*size), size: size}
 
 	for _, line := range lines {
 		if line.start.x == line.end.x {
@@ -86,8 +101,8 @@ func newBoard(lines []*line) board {
 			yStart := util.Min(line.start.y, line.end.y)
 			yEnd := util.Max(line.start.y, line.end.y)
 			for y := yStart; y <= yEnd; y++ {
-				index := getBoardIndex(x, y)
-				values[index]++
+				index := b.getValueIndex(x, y)
+				b.values[index]++
 			}
 
 		} else if line.start.y == line.end.y {
@@ -95,30 +110,30 @@ func newBoard(lines []*line) board {
 			xStart := util.Min(line.start.x, line.end.x)
 			xEnd := util.Max(line.start.x, line.end.x)
 			for x := xStart; x <= xEnd; x++ {
-				index := getBoardIndex(x, y)
-				values[index]++
+				index := b.getValueIndex(x, y)
+				b.values[index]++
 			}
 		}
 	}
 
-	return board(values)
+	return b
 }
 
 func (b board) String() string {
 	var sb strings.Builder
-	for y := 0; y < boardSize; y++ {
-		for x := 0; x < boardSize; x++ {
-			index := getBoardIndex(x, y)
-			fmt.Fprintf(&sb, "%d", b[index])
+	for y := 0; y < b.size; y++ {
+		for x := 0; x < b.size; x++ {
+			value := b.getValue(x, y)
+			fmt.Fprintf(&sb, "%d", value)
 		}
 		sb.WriteString("\n")
 	}
 	return sb.String()
 }
 
-func (b board) GetOverlapCount() int {
+func (b board) getOverlapCount() int {
 	count := 0
-	for _, value := range b {
+	for _, value := range b.values {
 		if value > 1 {
 			count++
 		}
@@ -154,4 +169,13 @@ func readDiagram(fileName string) (*diagram, error) {
 	}
 
 	return parseDiagram(lines)
+}
+
+func GetOverlapCount() int {
+	d, err := readDiagram("input.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	return d.board.getOverlapCount()
 }

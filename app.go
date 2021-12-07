@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
+
 	"advent2021.com/day05"
 )
 
 func main() {
-	day05.Test()
-	/*result := day04.GetLastScoreFromFile("input.txt", 5)
+	result := day05.GetOverlapCount()
 	fmt.Printf("%d value\n", result)
-	*/
 }
