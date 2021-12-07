@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
-
-	"advent2021.com/day04"
+	"advent2021.com/day05"
 )
 
 func main() {
-	result := day04.GetLastScoreFromFile("input.txt", 5)
+	day05.Test()
+	/*result := day04.GetLastScoreFromFile("input.txt", 5)
 	fmt.Printf("%d value\n", result)
+	*/
 }
