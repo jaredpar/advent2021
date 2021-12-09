@@ -3,31 +3,14 @@ package day06
 import (
 	"fmt"
 	"strings"
-
-	"advent2021.com/util"
 )
 
 type Fish int
-type School []Fish
-
-func NewFish(values []int) []Fish {
-	fishes := make([]Fish, len(values))
-	for i, v := range values {
-		fishes[i] = Fish(v)
-	}
-	return fishes
-}
+type School [9]int
 
 func (s *School) String() string {
-	var counts [9]int
-
-	for _, cur := range *s {
-		util.Assert(cur <= 8)
-		counts[cur]++
-	}
-
 	var sb strings.Builder
-	for i, count := range counts {
+	for i, count := range *s {
 		fmt.Fprintf(&sb, "%d (%d) ", i, count)
 	}
 
@@ -35,30 +18,34 @@ func (s *School) String() string {
 }
 
 func (s *School) Advance(days int) {
-	fishes := []Fish(*s)
 	for ; days > 0; days-- {
 		spawned := 0
-		for i, fish := range fishes {
-			if fish == 0 {
-				spawned++
-				fishes[i] = 6
+		for i, count := range *s {
+			if i == 0 {
+				spawned = count
 			} else {
-				fishes[i]--
+				(*s)[i-1] = count
 			}
 		}
 
-		for i := 0; i < spawned; i++ {
-			fishes = append(fishes, 8)
-		}
+		(*s)[6] += spawned
+		(*s)[8] = spawned
 	}
-
-	*s = fishes
 }
 
 func (s School) Count() int {
-	return len(s)
+	count := 0
+	for _, c := range s {
+		count += c
+	}
+
+	return count
 }
 
 func NewSchool(values []Fish) School {
-	return School(values)
+	var s School
+	for _, f := range values {
+		s[int(f)]++
+	}
+	return s
 }
