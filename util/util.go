@@ -79,3 +79,9 @@ func Max(x int, y int) int {
 	}
 	return y
 }
+
+func Assert(cond bool) {
+	if !cond {
+		panic("failed assert")
+	}
+}
