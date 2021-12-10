@@ -71,26 +71,21 @@ func (s Swarm) GetAlignmentEx() (position, fuel int) {
 
 	position = 0
 	fuel = math.MaxInt
-	distMap := make(map[int]int)
-	getDistance := func(len int) int {
-		if dist, found := distMap[len]; found {
-			return dist
+
+	// The fuel cost here is just an arithmic series
+	getFuelCost := func(len int) int {
+		if len == 1 {
+			return 1
 		}
 
-		dist := 0
-		for i := 1; i <= len; i++ {
-			dist += i
-		}
-
-		distMap[len] = dist
-		return dist
+		return (len * (1 + len)) / 2
 	}
 
 	for p := min; p <= max; p++ {
 		current := 0
 		for _, c := range s {
 			i := int(c)
-			current += getDistance(util.Abs(i - p))
+			current += getFuelCost(util.Abs(i - p))
 		}
 
 		if current < fuel {
