@@ -28,10 +28,26 @@ func testFuelCore(t *testing.T, line string, expectedPosition int, expectedFuel 
 	testUtil.AssertEqualInt(t, expectedFuel, fuel)
 }
 
+func testFuelExCore(t *testing.T, line string, expectedPosition int, expectedFuel int) {
+	values, err := util.ParseCommaSepInt(line)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	crabs := ConvertToCrabs(values)
+	swarm := NewSwarm(crabs)
+	position, fuel := swarm.GetAlignmentEx()
+	testUtil.AssertEqualInt(t, expectedPosition, position)
+	testUtil.AssertEqualInt(t, expectedFuel, fuel)
+}
+
 func TestSample(t *testing.T) {
 	testFuelCore(t, sampleText, 2, 37)
+	testFuelExCore(t, sampleText, 5, 168)
 }
 
 func TestInput(t *testing.T) {
 	testFuelCore(t, inputText, 371, 341558)
+	testFuelExCore(t, inputText, 484, 93214037)
 }

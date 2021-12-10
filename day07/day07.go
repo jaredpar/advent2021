@@ -54,3 +54,50 @@ func (s Swarm) GetAlignment() (position, fuel int) {
 
 	return
 }
+
+func (s Swarm) GetAlignmentEx() (position, fuel int) {
+	min := math.MaxInt
+	max := math.MinInt
+
+	for _, c := range s {
+		i := int(c)
+		if i < min {
+			min = i
+		}
+		if i > max {
+			max = i
+		}
+	}
+
+	position = 0
+	fuel = math.MaxInt
+	distMap := make(map[int]int)
+	getDistance := func(len int) int {
+		if dist, found := distMap[len]; found {
+			return dist
+		}
+
+		dist := 0
+		for i := 1; i <= len; i++ {
+			dist += i
+		}
+
+		distMap[len] = dist
+		return dist
+	}
+
+	for p := min; p <= max; p++ {
+		current := 0
+		for _, c := range s {
+			i := int(c)
+			current += getDistance(util.Abs(i - p))
+		}
+
+		if current < fuel {
+			fuel = current
+			position = p
+		}
+	}
+
+	return
+}
