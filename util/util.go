@@ -80,6 +80,14 @@ func Max(x int, y int) int {
 	return y
 }
 
+func Abs(x int) int {
+	if x < 0 {
+		x *= -1
+	}
+
+	return x
+}
+
 func Assert(cond bool) {
 	if !cond {
 		panic("failed assert")
