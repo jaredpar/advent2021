@@ -9,6 +9,17 @@ import (
 	"unicode"
 )
 
+func ParseLines(text string) []string {
+	reader := strings.NewReader(text)
+	scanner := bufio.NewScanner(reader)
+	lines := make([]string, 0)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	return lines
+}
+
 func ReadLines(f embed.FS, name string) ([]string, error) {
 	file, err := f.Open(name)
 	if err != nil {

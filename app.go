@@ -4,26 +4,26 @@ import (
 	"embed"
 	"fmt"
 
-	"advent2021.com/day07"
+	"advent2021.com/day08"
 	"advent2021.com/util"
 )
 
 //go:embed day07/*.txt
+//go:embed day08/*.txt
 var f embed.FS
 
 func main() {
 
-	line, err := util.ReadAsSingleLine(f, "day07/input.txt")
+	lines, err := util.ReadLines(f, "day08/input.txt")
 	if err != nil {
 		panic(err)
 	}
 
-	values, err := util.ParseCommaSepInt(line)
+	puzzle, err := day08.ParsePuzzle(lines)
 	if err != nil {
 		panic(err)
 	}
 
-	s := day07.NewSwarm(day07.ConvertToCrabs(values))
-	position, fuel := s.GetAlignmentEx()
-	fmt.Printf("position %d, fuel %d\n", position, fuel)
+	count := puzzle.GetKnownOutputCount()
+	fmt.Printf("count is %d", count)
 }
