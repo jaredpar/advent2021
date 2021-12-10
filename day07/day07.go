@@ -9,7 +9,7 @@ import (
 type Crab int
 type Swarm []Crab
 
-func ConvertToCrabSlice(values []int) []Crab {
+func ConvertToCrabs(values []int) []Crab {
 	crabs := make([]Crab, len(values))
 	for i, v := range values {
 		crabs[i] = Crab(v)

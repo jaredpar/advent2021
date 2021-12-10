@@ -3,7 +3,9 @@ package util
 import (
 	"bufio"
 	"embed"
+	"errors"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -41,6 +43,41 @@ func ReadLinesAsInt(f embed.FS, name string) ([]int, error) {
 	}
 
 	return values, nil
+}
+
+func ReadAsSingleLine(f embed.FS, name string) (string, error) {
+	file, err := f.Open(name)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	if !scanner.Scan() {
+		return "", nil
+	}
+
+	line := scanner.Text()
+	if scanner.Scan() {
+		return "", errors.New("file had multiple lines")
+	}
+
+	return line, nil
+}
+
+func ParseCommaSepInt(line string) ([]int, error) {
+	parts := strings.Split(line, ",")
+	numbers := make([]int, 0, len(parts))
+	for _, part := range parts {
+		number, err := strconv.Atoi(part)
+		if err != nil {
+			return nil, err
+		}
+
+		numbers = append(numbers, number)
+	}
+
+	return numbers, nil
 }
 
 func SplitOnWhiteSpace(line string) []string {
