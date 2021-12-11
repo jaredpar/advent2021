@@ -24,6 +24,6 @@ func main() {
 		panic(err)
 	}
 
-	count := puzzle.GetKnownOutputCount()
+	count := puzzle.GetKnownEasyOutputCount()
 	fmt.Printf("count is %d", count)
 }
