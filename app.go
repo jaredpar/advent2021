@@ -25,6 +25,6 @@ func main() {
 		panic(err)
 	}
 
-	sum := day09.Part1(f)
+	sum := day09.Part2(f)
 	fmt.Printf("result is %d", sum)
 }

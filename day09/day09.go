@@ -105,6 +105,11 @@ func Part2(f *FloorMap) int {
 		}
 
 		found[index] = true
+		value := f.values[index]
+		if value == 9 {
+			return 0
+		}
+
 		return 1 +
 			calcBasinSize(row-1, column) +
 			calcBasinSize(row+1, column) +
@@ -134,7 +139,7 @@ func Part2(f *FloorMap) int {
 		}
 	}
 
-	result := 0
+	result := 1
 	for _, size := range maxes {
 		result *= size
 	}
