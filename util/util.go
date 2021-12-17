@@ -114,6 +114,15 @@ func SplitOnWhiteSpace(line string) []string {
 	return items
 }
 
+func RuneToInt(r rune) (int, error) {
+	value := int(r - '0')
+	if value >= 0 && value <= 9 {
+		return value, nil
+	}
+
+	return value, errors.New("invalid value")
+}
+
 func Min(x int, y int) int {
 	if x < y {
 		return x
