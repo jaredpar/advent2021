@@ -21,6 +21,6 @@ func main() {
 		panic(err)
 	}
 
-	score := day10.Part1(lines)
+	score := day10.Part2(lines)
 	fmt.Printf("Score is %d\n", score)
 }
