@@ -124,6 +124,15 @@ func RuneToInt(r rune) (int, error) {
 	return value, errors.New("invalid value")
 }
 
+// Return the first rune in the string. Will panic on a zero length string
+func FirstRune(text string) rune {
+	for _, r := range text {
+		return r
+	}
+
+	panic("zero length string")
+}
+
 func DigitToRune(d int) rune {
 	return rune('0' + d)
 }
