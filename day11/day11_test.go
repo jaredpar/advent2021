@@ -33,7 +33,7 @@ func TestSamplePart2(t *testing.T) {
 	for {
 		steps++
 		flashes := c.RunStep()
-		if flashes == c.Count() {
+		if flashes == c.Grid.Count() {
 			break
 		}
 	}

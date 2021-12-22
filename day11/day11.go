@@ -8,8 +8,7 @@ import (
 )
 
 type Cavern struct {
-	values       []int
-	columnLength int
+	Grid *util.Grid
 }
 
 func ParseCavern(lines []string) (*Cavern, error) {
@@ -31,41 +30,22 @@ func ParseCavern(lines []string) (*Cavern, error) {
 		}
 	}
 
-	return &Cavern{values: values, columnLength: columnLength}, nil
-}
-
-func (c *Cavern) Count() int {
-	return len(c.values)
-}
-
-func (c *Cavern) Index(row, column int) int {
-	return (row * c.columnLength) + column
-}
-
-func (c *Cavern) Rows() int {
-	return len(c.values) / c.columnLength
-}
-
-func (c *Cavern) Columns() int {
-	return c.columnLength
-}
-
-func (c *Cavern) Value(row, column int) int {
-	index := c.Index(row, column)
-	return c.values[index]
+	grid := util.NewGrid(values, columnLength)
+	return &Cavern{Grid: grid}, nil
 }
 
 // Run a single step and return the number of flashes that occurred
 func (cavern *Cavern) RunStep() int {
+	grid := cavern.Grid
 	count := 0
 
 	// Flash the current octopus and return number of flashes it created
 	var flash func(index, row, column int)
 	flash = func(index, row, column int) {
 		impl := func(row, column int) {
-			if row >= 0 && row < cavern.Rows() && column >= 0 && column < cavern.Columns() {
-				index := cavern.Index(row, column)
-				switch cavern.values[index] {
+			if row >= 0 && row < grid.Rows() && column >= 0 && column < grid.Columns() {
+				index := grid.Index(row, column)
+				switch grid.Values[index] {
 				case -1:
 					// ignore already flashed
 				case 9:
@@ -74,13 +54,13 @@ func (cavern *Cavern) RunStep() int {
 				case 10:
 					// normal flash, let the core loop handle
 				default:
-					cavern.values[index]++
+					grid.Values[index]++
 				}
 			}
 		}
 
 		count++
-		cavern.values[index] = -1
+		grid.Values[index] = -1
 		impl(row-1, column)
 		impl(row-1, column+1)
 		impl(row, column+1)
@@ -91,22 +71,22 @@ func (cavern *Cavern) RunStep() int {
 		impl(row-1, column-1)
 	}
 
-	for i := 0; i < len(cavern.values); i++ {
-		cavern.values[i]++
+	for i := 0; i < len(grid.Values); i++ {
+		grid.Values[i]++
 	}
 
-	for r := 0; r < cavern.Rows(); r++ {
-		for c := 0; c < cavern.Columns(); c++ {
-			index := cavern.Index(r, c)
-			if cavern.values[index] == 10 {
+	for r := 0; r < grid.Rows(); r++ {
+		for c := 0; c < grid.Columns(); c++ {
+			index := grid.Index(r, c)
+			if grid.Values[index] == 10 {
 				flash(index, r, c)
 			}
 		}
 	}
 
-	for i := 0; i < len(cavern.values); i++ {
-		if cavern.values[i] >= 10 || cavern.values[i] == -1 {
-			cavern.values[i] = 0
+	for i := 0; i < len(grid.Values); i++ {
+		if grid.Values[i] >= 10 || grid.Values[i] == -1 {
+			grid.Values[i] = 0
 		}
 	}
 
@@ -123,10 +103,11 @@ func (cavern *Cavern) RunSteps(steps int) int {
 }
 
 func (cavern *Cavern) String() string {
+	grid := cavern.Grid
 	var sb strings.Builder
-	for r := 0; r < cavern.Rows(); r++ {
-		for c := 0; c < cavern.Columns(); c++ {
-			sb.WriteRune(util.DigitToRune(cavern.Value(r, c)))
+	for r := 0; r < grid.Rows(); r++ {
+		for c := 0; c < grid.Columns(); c++ {
+			sb.WriteRune(util.DigitToRune(grid.Value(r, c)))
 		}
 		sb.WriteString("\n")
 	}
