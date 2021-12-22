@@ -14,24 +14,21 @@ var sampleText string
 //go:embed sample2.txt
 var sample2Text string
 
+//go:embed input.txt
+var inputText string
+
 func TestSamplePart1(t *testing.T) {
-	lines := util.ParseLines(sampleText)
-	cs, err := ParseCaveSystem(lines)
-	if err != nil {
-		t.Fatal(err)
+	run := func(text string, expected int) {
+		lines := util.ParseLines(text)
+		cs, err := ParseCaveSystem(lines)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		paths := Part1(cs)
+		testUtil.AssertEqualInt(t, expected, len(paths))
 	}
-
-	paths := Part1(cs)
-	testUtil.AssertEqualInt(t, 10, len(paths))
-}
-
-func TestSample2Part1(t *testing.T) {
-	lines := util.ParseLines(sample2Text)
-	cs, err := ParseCaveSystem(lines)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	paths := Part1(cs)
-	testUtil.AssertEqualInt(t, 19, len(paths))
+	run(sampleText, 10)
+	run(sample2Text, 19)
+	run(inputText, 4707)
 }
