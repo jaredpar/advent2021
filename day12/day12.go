@@ -31,12 +31,18 @@ func NewCave(label string) *Cave {
 	return &Cave{Label: label}
 }
 
-func (c *Cave) IsBig() bool {
-	return len(c.Label) == 0 && unicode.IsLower(util.FirstRune(c.Label))
+func (c *Cave) IsSmall() bool {
+	for _, r := range c.Label {
+		if !unicode.IsLower(r) {
+			return false
+		}
+	}
+
+	return true
 }
 
-func (c *Cave) IsSmall() bool {
-	return !c.IsBig()
+func (c *Cave) IsBig() bool {
+	return !c.IsSmall()
 }
 
 func (c *Cave) IsStart() bool {
@@ -108,4 +114,42 @@ func ParseCaveSystem(lines []string) (*CaveSystem, error) {
 	}
 
 	return cs, nil
+}
+
+func Part1(cs *CaveSystem) []string {
+	visited := make(map[string]bool)
+	paths := make([]string, 0)
+	var visitOne func(c *Cave, path string)
+	visitOne = func(c *Cave, path string) {
+		if len(path) > 0 {
+			path = path + "," + c.Label
+		} else {
+			util.Assert(c.Label == labelStart)
+			path = c.Label
+		}
+
+		if c.IsEnd() {
+			paths = append(paths, path)
+			return
+		}
+
+		if c.IsSmall() {
+			_, present := visited[c.Label]
+			if present {
+				return
+			}
+
+			visited[c.Label] = true
+			defer delete(visited, c.Label)
+		}
+
+		for _, connection := range c.Connections {
+			if !connection.IsStart() {
+				visitOne(connection, path)
+			}
+		}
+	}
+
+	visitOne(cs.Start, "")
+	return paths
 }
