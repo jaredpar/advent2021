@@ -114,6 +114,7 @@ func SplitOnWhiteSpace(line string) []string {
 	return items
 }
 
+// Convert a rune value between '0' and '9' to a int value
 func RuneToInt(r rune) (int, error) {
 	value := int(r - '0')
 	if value >= 0 && value <= 9 {
@@ -121,6 +122,10 @@ func RuneToInt(r rune) (int, error) {
 	}
 
 	return value, errors.New("invalid value")
+}
+
+func DigitToRune(d int) rune {
+	return rune('0' + d)
 }
 
 func Min(x int, y int) int {
