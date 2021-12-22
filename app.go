@@ -27,6 +27,13 @@ func main() {
 		panic(err)
 	}
 
-	flashes := c.RunSteps(100)
-	fmt.Printf("%d\n", flashes)
+	steps := 0
+	for {
+		steps++
+		flashes := c.RunStep()
+		if flashes == c.Count() {
+			fmt.Printf("%d\n", steps)
+			break
+		}
+	}
 }

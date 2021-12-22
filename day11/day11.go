@@ -34,6 +34,10 @@ func ParseCavern(lines []string) (*Cavern, error) {
 	return &Cavern{values: values, columnLength: columnLength}, nil
 }
 
+func (c *Cavern) Count() int {
+	return len(c.values)
+}
+
 func (c *Cavern) Index(row, column int) int {
 	return (row * c.columnLength) + column
 }

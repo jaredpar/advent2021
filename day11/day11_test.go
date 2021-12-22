@@ -21,3 +21,21 @@ func TestSamplePart1(t *testing.T) {
 	flashes := c.RunSteps(100)
 	testUtil.AssertEqualInt(t, 1656, flashes)
 }
+
+func TestSamplePart2(t *testing.T) {
+	lines := util.ParseLines(sampleText)
+	c, err := ParseCavern(lines)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	steps := 0
+	for {
+		steps++
+		flashes := c.RunStep()
+		if flashes == c.Count() {
+			break
+		}
+	}
+	testUtil.AssertEqualInt(t, 195, steps)
+}
