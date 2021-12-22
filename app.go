@@ -31,7 +31,7 @@ func main() {
 	for {
 		steps++
 		flashes := c.RunStep()
-		if flashes == c.Count() {
+		if flashes == c.Grid.Count() {
 			fmt.Printf("%d\n", steps)
 			break
 		}
