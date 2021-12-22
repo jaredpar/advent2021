@@ -153,3 +153,50 @@ func Part1(cs *CaveSystem) []string {
 	visitOne(cs.Start, "")
 	return paths
 }
+
+func Part2(cs *CaveSystem) []string {
+	visited := make(map[string]bool)
+	inDoubleVisit := false
+
+	paths := make([]string, 0)
+	var visitOne func(c *Cave, path string)
+	visitOne = func(c *Cave, path string) {
+		if len(path) > 0 {
+			path = path + "," + c.Label
+		} else {
+			util.Assert(c.Label == labelStart)
+			path = c.Label
+		}
+
+		if c.IsEnd() {
+			paths = append(paths, path)
+			return
+		}
+
+		if c.IsSmall() {
+			_, present := visited[c.Label]
+			if present {
+				if !inDoubleVisit {
+					inDoubleVisit = true
+					defer func() {
+						inDoubleVisit = false
+					}()
+				} else {
+					return
+				}
+			} else {
+				visited[c.Label] = true
+				defer delete(visited, c.Label)
+			}
+		}
+
+		for _, connection := range c.Connections {
+			if !connection.IsStart() {
+				visitOne(connection, path)
+			}
+		}
+	}
+
+	visitOne(cs.Start, "")
+	return paths
+}

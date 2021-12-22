@@ -28,10 +28,12 @@ func main() {
 		panic(err)
 	}
 
-	paths := day12.Part1(cs)
-	for _, path := range paths {
-		fmt.Println(path)
-	}
+	paths := day12.Part2(cs)
+	/*
+		for _, path := range paths {
+			fmt.Println(path)
+		}
+	*/
 
 	fmt.Printf("%d paths", len(paths))
 }
