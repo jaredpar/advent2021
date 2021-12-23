@@ -54,13 +54,9 @@ func (g *Grid) SetValue(row, column, value int) {
 	g.Values[index] = value
 }
 
-func (g *Grid) Expand(row, column int) {
+func (g *Grid) Resize(row, column int) {
 	if row == g.Rows() && column == g.Columns() {
 		return
-	}
-
-	if row < g.Rows() || column < g.Columns() {
-		panic("expand can only grow the columns or rows")
 	}
 
 	oldColumnLength := g.ColumnLength
@@ -71,6 +67,8 @@ func (g *Grid) Expand(row, column int) {
 
 	for i, v := range oldValues {
 		r, c := rowColumn(i, oldColumnLength)
-		g.SetValue(r, c, v)
+		if r < row && c < column {
+			g.SetValue(r, c, v)
+		}
 	}
 }

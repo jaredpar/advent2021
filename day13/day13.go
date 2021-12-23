@@ -16,6 +16,42 @@ func NewPaper(g *util.Grid) *Paper {
 	return &Paper{Grid: g}
 }
 
+func (p *Paper) Fold(isRow bool, value int) {
+	g := p.Grid
+	if isRow {
+		limit := util.Min(value, g.Rows()-(value+1))
+		for i := 1; i <= limit; i++ {
+			for c := 0; c < g.Columns(); c++ {
+				if g.Value(i+value, c) == 1 {
+					g.SetValue(value-i, c, 1)
+				}
+			}
+		}
+		g.Resize(value, g.Columns())
+	} else {
+		limit := util.Min(value, g.Columns()-(value+1))
+		for r := 0; r < g.Rows(); r++ {
+			for i := 1; i <= limit; i++ {
+				if g.Value(r, i+value) == 1 {
+					g.SetValue(r, value-i, 1)
+				}
+			}
+		}
+		g.Resize(g.Rows(), value)
+	}
+}
+
+func (p *Paper) CountMarks() int {
+	count := 0
+	for _, v := range p.Grid.Values {
+		if v == 1 {
+			count++
+		}
+	}
+
+	return count
+}
+
 func (p *Paper) String() string {
 	var sb strings.Builder
 	for r := 0; r < p.Grid.Rows(); r++ {
@@ -72,12 +108,12 @@ func ParseManual(lines []string) (*Manual, error) {
 			return nil, err
 		}
 
-		g.Expand(util.Max(g.Rows(), row+1), util.Max(g.Columns(), column+1))
+		g.Resize(util.Max(g.Rows(), row+1), util.Max(g.Columns(), column+1))
 		g.SetValue(row, column, 1)
 	}
 
 	lines = lines[foldIndex:]
-	folds := make([]Fold, len(lines))
+	folds := make([]Fold, 0, len(lines))
 	for _, line := range lines {
 		parts := strings.Split(line, " ")
 		if len(parts) != 3 {

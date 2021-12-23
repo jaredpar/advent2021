@@ -24,7 +24,7 @@ func TestExpand(t *testing.T) {
 		g.Values[i] = i
 	}
 
-	g.Expand(10, 10)
+	g.Resize(10, 10)
 	for r := 0; r < g.Rows(); r++ {
 		for c := 0; c < g.Columns(); c++ {
 			if r < 5 && c < 5 {
@@ -33,6 +33,20 @@ func TestExpand(t *testing.T) {
 			} else {
 				testUtil.AssertEqualInt(t, 0, g.Value(r, c))
 			}
+		}
+	}
+}
+
+func TestShrink(t *testing.T) {
+	g := NewGrid(5, 5)
+	for i := 0; i < g.Count(); i++ {
+		g.Values[i] = 1
+	}
+
+	g.Resize(3, 3)
+	for r := 0; r < g.Rows(); r++ {
+		for c := 0; c < g.Columns(); c++ {
+			testUtil.AssertEqualInt(t, 1, g.Value(r, c))
 		}
 	}
 }

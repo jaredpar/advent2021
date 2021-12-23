@@ -19,7 +19,7 @@ var f embed.FS
 
 func main() {
 
-	lines, err := util.ReadLines(f, "day13/sample.txt")
+	lines, err := util.ReadLines(f, "day13/input.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -30,4 +30,8 @@ func main() {
 	}
 
 	fmt.Println(m.Paper.String())
+	fold := m.Folds[0]
+	m.Paper.Fold(fold.IsRow, fold.Value)
+	fmt.Println(m.Paper.String())
+	fmt.Printf("%d marks\n", m.Paper.CountMarks())
 }
