@@ -97,46 +97,65 @@ func Part1(d *Data) int {
 	return max - min
 }
 
-func Part2(d *Data) int {
-	const maxDepth = 40
-	countMap := make(map[rune]int)
+func dumpRuneMap(runeMap map[rune]int) {
+	for r, c := range runeMap {
+		fmt.Printf("%s -> %d\n", string(r), c)
+	}
+	fmt.Println()
+}
 
-	updateCount := func(r rune) {
-		count, present := countMap[r]
-		if !present {
-			count = 0
-		}
-		count++
-		countMap[r] = count
+func Part2(d *Data, steps int) int {
+	// Hold the number of times a given pair occurs in the sequence at this point
+	pairMap := make(map[util.RunePair]int)
+	incrementPair := func(pair util.RunePair, inc int) {
+		count, _ := pairMap[pair]
+		count += inc
+		pairMap[pair] = count
 	}
 
-	var run func(pair util.RunePair, depth int)
-	run = func(pair util.RunePair, depth int) {
-		r, present := d.Rules[pair]
-		if !present {
-			return
+	copyPairMap := func() map[util.RunePair]int {
+		m := make(map[util.RunePair]int)
+		for k, v := range pairMap {
+			m[k] = v
 		}
-
-		if depth == maxDepth {
-			updateCount(r)
-		} else {
-			run(util.NewRunePair(pair.Left, r), depth+1)
-			run(util.NewRunePair(r, pair.Right), depth+1)
-		}
+		return m
 	}
 
+	// Holds the number of times a given character will appear in the final output
+	runeMap := make(map[rune]int)
 	runes := []rune(d.Template)
-	for _, r := range runes {
-		updateCount(r)
+	for i := 0; i < len(runes); i++ {
+		r := runes[i]
+		if i+1 < len(runes) {
+			pair := util.NewRunePair(r, runes[i+1])
+			incrementPair(pair, 1)
+		}
+		runeCount, _ := runeMap[r]
+		runeMap[r] = runeCount + 1
 	}
 
-	for i := 0; i+1 < len(runes); i++ {
-		run(util.NewRunePair(runes[i], runes[i+1]), 1)
+	for i := 0; i < steps; i++ {
+		pairMapCopy := copyPairMap()
+		for pair, r := range d.Rules {
+			count, _ := pairMapCopy[pair]
+			pair1 := util.NewRunePair(pair.Left, r)
+			incrementPair(pair1, count)
+
+			pair2 := util.NewRunePair(r, pair.Right)
+			if pair2 != pair1 {
+				incrementPair(pair2, count)
+			}
+			curCount, _ := pairMap[pair]
+			pairMap[pair] = curCount - count
+
+			runeCount, _ := runeMap[r]
+			runeMap[r] = runeCount + count
+		}
 	}
 
 	max := 0
 	min := math.MaxInt
-	for _, v := range countMap {
+	for _, v := range runeMap {
 		max = util.Max(max, v)
 		min = util.Min(min, v)
 	}

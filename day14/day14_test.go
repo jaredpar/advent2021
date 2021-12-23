@@ -30,3 +30,21 @@ func TestPart1(t *testing.T) {
 	run(sampleText, 1588)
 	run(inputText, 2947)
 }
+
+func TestPart2(t *testing.T) {
+	run := func(text string, expected int) {
+		lines := util.ParseLines(text)
+		d, err := ParseData(lines)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		result := Part2(d, 40)
+		if result != expected {
+			t.Errorf("expected %d but got %d", expected, result)
+		}
+	}
+
+	run(sampleText, 2188189693529)
+	run(inputText, 3232426226464)
+}
