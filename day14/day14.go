@@ -11,7 +11,7 @@ import (
 
 type Data struct {
 	Template string
-	Rules    map[util.RunePair]string
+	Rules    map[util.RunePair]rune
 }
 
 func ParseData(lines []string) (*Data, error) {
@@ -20,7 +20,7 @@ func ParseData(lines []string) (*Data, error) {
 	}
 
 	template := lines[0]
-	rules := make(map[util.RunePair]string)
+	rules := make(map[util.RunePair]rune)
 	lines = lines[2:]
 
 	for _, line := range lines {
@@ -35,7 +35,12 @@ func ParseData(lines []string) (*Data, error) {
 		}
 
 		pair := util.NewRunePair(runes[0], runes[1])
-		rules[pair] = parts[2]
+		runes = []rune(parts[2])
+		if len(runes) != 1 {
+			return nil, fmt.Errorf("bad value: %s", parts[2])
+		}
+
+		rules[pair] = runes[0]
 	}
 
 	return &Data{Template: template, Rules: rules}, nil
@@ -53,7 +58,7 @@ func (d *Data) Run(steps int) string {
 				sb.WriteRune(line[i])
 				pair := util.NewRunePair(line[i], line[i+1])
 				if insert, ok := d.Rules[pair]; ok {
-					sb.WriteString(insert)
+					sb.WriteRune(insert)
 				}
 			}
 		}
@@ -92,19 +97,41 @@ func Part1(d *Data) int {
 	return max - min
 }
 
-/*
 func Part2(d *Data) int {
+	const maxDepth = 40
 	countMap := make(map[rune]int)
-	run := func(left, right rune)
 
-	for _, r := range result {
-		count, ok := countMap[r]
-		if !ok {
+	updateCount := func(r rune) {
+		count, present := countMap[r]
+		if !present {
 			count = 0
 		}
-
 		count++
 		countMap[r] = count
+	}
+
+	var run func(pair util.RunePair, depth int)
+	run = func(pair util.RunePair, depth int) {
+		r, present := d.Rules[pair]
+		if !present {
+			return
+		}
+
+		if depth == maxDepth {
+			updateCount(r)
+		} else {
+			run(util.NewRunePair(pair.Left, r), depth+1)
+			run(util.NewRunePair(r, pair.Right), depth+1)
+		}
+	}
+
+	runes := []rune(d.Template)
+	for _, r := range runes {
+		updateCount(r)
+	}
+
+	for i := 0; i+1 < len(runes); i++ {
+		run(util.NewRunePair(runes[i], runes[i+1]), 1)
 	}
 
 	max := 0
@@ -116,5 +143,3 @@ func Part2(d *Data) int {
 
 	return max - min
 }
-
-*/

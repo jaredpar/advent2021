@@ -20,7 +20,7 @@ var f embed.FS
 
 func main() {
 
-	lines, err := util.ReadLines(f, "day14/input.txt")
+	lines, err := util.ReadLines(f, "day14/sample.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -30,6 +30,6 @@ func main() {
 		panic(err)
 	}
 
-	result := day14.Part1(d)
+	result := day14.Part2(d)
 	fmt.Printf("%d\n", result)
 }
