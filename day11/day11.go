@@ -30,7 +30,7 @@ func ParseCavern(lines []string) (*Cavern, error) {
 		}
 	}
 
-	grid := util.NewGrid(values, columnLength)
+	grid := &util.Grid{Values: values, ColumnLength: columnLength}
 	return &Cavern{Grid: grid}, nil
 }
 
