@@ -4,7 +4,7 @@ import (
 	"embed"
 	"fmt"
 
-	"advent2021.com/day12"
+	"advent2021.com/day13"
 	"advent2021.com/util"
 )
 
@@ -14,26 +14,20 @@ import (
 //go:embed day10/*.txt
 //go:embed day11/*.txt
 //go:embed day12/*.txt
+//go:embed day13/*.txt
 var f embed.FS
 
 func main() {
 
-	lines, err := util.ReadLines(f, "day12/input.txt")
+	lines, err := util.ReadLines(f, "day13/sample.txt")
 	if err != nil {
 		panic(err)
 	}
 
-	cs, err := day12.ParseCaveSystem(lines)
+	m, err := day13.ParseManual(lines)
 	if err != nil {
 		panic(err)
 	}
 
-	paths := day12.Part2(cs)
-	/*
-		for _, path := range paths {
-			fmt.Println(path)
-		}
-	*/
-
-	fmt.Printf("%d paths", len(paths))
+	fmt.Println(m.Paper.String())
 }
