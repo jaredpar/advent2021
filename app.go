@@ -29,9 +29,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(m.Paper.String())
-	fold := m.Folds[0]
-	m.Paper.Fold(fold.IsRow, fold.Value)
+	m.RunFolds()
 	fmt.Println(m.Paper.String())
 	fmt.Printf("%d marks\n", m.Paper.CountMarks())
 }

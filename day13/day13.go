@@ -83,6 +83,14 @@ type Manual struct {
 	Folds []Fold
 }
 
+func (m *Manual) RunFolds() {
+	for _, fold := range m.Folds {
+		m.Paper.Fold(fold.IsRow, fold.Value)
+	}
+
+	m.Folds = make([]Fold, 0)
+}
+
 func ParseManual(lines []string) (*Manual, error) {
 	g := util.NewGrid(1, 1)
 	foldIndex := 0

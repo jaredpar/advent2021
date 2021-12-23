@@ -25,10 +25,7 @@ func TestSample(t *testing.T) {
 		t.Fatalf("expected 2 folds but got %d", len(m.Folds))
 	}
 
-	for _, fold := range m.Folds {
-		m.Paper.Fold(fold.IsRow, fold.Value)
-	}
-
+	m.RunFolds()
 	testUtil.AssertEqualInt(t, 16, m.Paper.CountMarks())
 }
 
