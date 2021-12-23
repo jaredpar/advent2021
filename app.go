@@ -20,7 +20,7 @@ var f embed.FS
 
 func main() {
 
-	lines, err := util.ReadLines(f, "day14/sample.txt")
+	lines, err := util.ReadLines(f, "day14/input.txt")
 	if err != nil {
 		panic(err)
 	}
