@@ -73,38 +73,7 @@ func (d *Data) Run(steps int) string {
 	return string(line)
 }
 
-func Part1(d *Data) int {
-	result := d.Run(10)
-	countMap := make(map[rune]int)
-
-	for _, r := range result {
-		count, ok := countMap[r]
-		if !ok {
-			count = 0
-		}
-
-		count++
-		countMap[r] = count
-	}
-
-	max := 0
-	min := math.MaxInt
-	for _, v := range countMap {
-		max = util.Max(max, v)
-		min = util.Min(min, v)
-	}
-
-	return max - min
-}
-
-func dumpRuneMap(runeMap map[rune]int) {
-	for r, c := range runeMap {
-		fmt.Printf("%s -> %d\n", string(r), c)
-	}
-	fmt.Println()
-}
-
-func Part2(d *Data, steps int) int {
+func runExpansion(d *Data, steps int) int {
 	// Hold the number of times a given pair occurs in the sequence at this point
 	pairMap := make(map[util.RunePair]int)
 	incrementPair := func(pair util.RunePair, inc int) {
@@ -161,4 +130,12 @@ func Part2(d *Data, steps int) int {
 	}
 
 	return max - min
+}
+
+func Part1(d *Data) int {
+	return runExpansion(d, 10)
+}
+
+func Part2(d *Data) int {
+	return runExpansion(d, 40)
 }

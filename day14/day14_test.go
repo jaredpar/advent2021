@@ -39,7 +39,7 @@ func TestPart2(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		result := Part2(d, 40)
+		result := Part2(d)
 		if result != expected {
 			t.Errorf("expected %d but got %d", expected, result)
 		}

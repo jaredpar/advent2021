@@ -30,6 +30,6 @@ func main() {
 		panic(err)
 	}
 
-	result := day14.Part2(d, 40)
+	result := day14.Part2(d)
 	fmt.Printf("%d\n", result)
 }
