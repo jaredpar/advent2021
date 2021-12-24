@@ -27,4 +27,5 @@ func TestPart1(t *testing.T) {
 	}
 
 	run(sampleText, 40)
+	run(inputText, 589)
 }

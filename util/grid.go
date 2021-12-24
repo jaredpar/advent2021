@@ -59,6 +59,10 @@ func (g *Grid) SetValue(row, column, value int) {
 	g.Values[index] = value
 }
 
+func (g *Grid) SetAll(value int) {
+	SetAllInt(g.Values, value)
+}
+
 func (g *Grid) Resize(row, column int) {
 	if row == g.Rows() && column == g.Columns() {
 		return

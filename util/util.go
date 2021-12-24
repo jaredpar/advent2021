@@ -133,6 +133,12 @@ func FirstRune(text string) rune {
 	panic("zero length string")
 }
 
+func SetAllInt(values []int, value int) {
+	for i := 0; i < len(values); i++ {
+		values[i] = value
+	}
+}
+
 func DigitToRune(d int) rune {
 	return rune('0' + d)
 }
