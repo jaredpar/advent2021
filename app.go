@@ -34,6 +34,21 @@ func runDay15Part1() {
 	fmt.Printf("%d\n", result)
 }
 
+func runDay15Part2() {
+	lines, err := util.ReadLines(f, "day15/input.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	cave, err := day15.ParseCave(lines)
+	if err != nil {
+		panic(err)
+	}
+
+	result := day15.Part2(cave)
+	fmt.Printf("%d\n", result)
+}
+
 func main() {
-	runDay15Part1()
+	runDay15Part2()
 }

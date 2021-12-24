@@ -2,12 +2,40 @@ package day15
 
 import (
 	"sort"
+	"strings"
 
 	"advent2021.com/util"
 )
 
 type Cave struct {
 	Grid *util.Grid
+}
+
+func gridToString(grid *util.Grid) string {
+	var sb strings.Builder
+	for r := 0; r < grid.Rows(); r++ {
+		for c := 0; c < grid.Columns(); c++ {
+			digit := grid.Value(r, c)
+			sb.WriteRune(util.DigitToRune(digit))
+		}
+		sb.WriteString("\n")
+	}
+
+	return sb.String()
+}
+
+func (cave *Cave) String() string {
+	var sb strings.Builder
+	grid := cave.Grid
+	for r := 0; r < grid.Rows(); r++ {
+		for c := 0; c < grid.Columns(); c++ {
+			digit := grid.Value(r, c)
+			sb.WriteRune(util.DigitToRune(digit))
+		}
+		sb.WriteString("\n")
+	}
+
+	return sb.String()
 }
 
 func ParseCave(lines []string) (*Cave, error) {
@@ -85,4 +113,30 @@ func shortestPath(grid *util.Grid) int {
 
 func Part1(cave *Cave) int {
 	return shortestPath(cave.Grid)
+}
+
+func Part2(cave *Cave) int {
+	oldGrid := cave.Grid
+	newGrid := util.NewGrid(oldGrid.Rows()*5, oldGrid.Columns()*5)
+
+	fillSection := func(row, col, inc int) {
+		for r := 0; r < oldGrid.Rows(); r++ {
+			for c := 0; c < oldGrid.Columns(); c++ {
+				value := oldGrid.Value(r, c) + inc
+				if value > 9 {
+					value -= 9
+				}
+
+				newGrid.SetValue(row+r, col+c, value)
+			}
+		}
+	}
+
+	for r := 0; r < 5; r++ {
+		for c := 0; c < 5; c++ {
+			fillSection(r*oldGrid.Rows(), c*oldGrid.Columns(), r+c)
+		}
+	}
+
+	return shortestPath(newGrid)
 }
