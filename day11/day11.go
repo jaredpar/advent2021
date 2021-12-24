@@ -1,7 +1,6 @@
 package day11
 
 import (
-	"errors"
 	"strings"
 
 	"advent2021.com/util"
@@ -12,25 +11,10 @@ type Cavern struct {
 }
 
 func ParseCavern(lines []string) (*Cavern, error) {
-	values := make([]int, 0)
-	columnLength := 0
-	for _, line := range lines {
-		if columnLength == 0 {
-			columnLength = len(line)
-		} else if columnLength != len(line) {
-			return nil, errors.New("invalid column length")
-		}
-
-		for _, r := range line {
-			value, err := util.RuneToInt(r)
-			if err != nil {
-				return nil, err
-			}
-			values = append(values, value)
-		}
+	grid, err := util.ParseGridFromLines(lines)
+	if err != nil {
+		return nil, err
 	}
-
-	grid := &util.Grid{Values: values, ColumnLength: columnLength}
 	return &Cavern{Grid: grid}, nil
 }
 

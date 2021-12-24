@@ -1,5 +1,10 @@
 package util
 
+import (
+	"errors"
+	"fmt"
+)
+
 type Grid struct {
 	Values       []int
 	ColumnLength int
@@ -71,4 +76,33 @@ func (g *Grid) Resize(row, column int) {
 			g.SetValue(r, c, v)
 		}
 	}
+}
+
+// Parse out a grid from a series of single digit entries on a
+// line like the following
+//
+// 0123
+// 4567
+func ParseGridFromLines(lines []string) (*Grid, error) {
+	if len(lines) == 0 {
+		return nil, errors.New("need at least one line")
+	}
+
+	grid := NewGrid(len(lines), len(lines[0]))
+	for row, line := range lines {
+		if len(line) != grid.Rows() {
+			return nil, fmt.Errorf("line has wrong length: %s", line)
+		}
+
+		for col, r := range line {
+			digit, err := RuneToInt(r)
+			if err != nil {
+				return nil, err
+			}
+
+			grid.SetValue(row, col, digit)
+		}
+	}
+
+	return grid, nil
 }
