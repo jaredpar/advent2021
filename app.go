@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"advent2021.com/day15"
+	"advent2021.com/day16"
 	"advent2021.com/util"
 )
 
@@ -49,6 +50,11 @@ func runDay15Part2() {
 	fmt.Printf("%d\n", result)
 }
 
+func runDay16Part1() {
+	packet, _ := day16.ParsePacket("D2FE28")
+	fmt.Println(packet.Payload)
+}
+
 func main() {
-	runDay15Part2()
+	runDay16Part1()
 }
