@@ -1,6 +1,7 @@
 package day16
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -28,17 +29,30 @@ func toBinaryString(r rune) (string, error) {
 	return str, nil
 }
 
-type Packet struct {
+type PacketData struct {
 	Version int
 	TypeId  int
 	Payload string
 }
 
-func NewPacket(version, typeId int, payload string) *Packet {
-	return &Packet{Version: version, TypeId: typeId, Payload: payload}
+type Packet interface {
+	TypeId() int
 }
 
-func ParsePacket(text string) (*Packet, error) {
+type LiteralPacket struct {
+	typeId int
+	Value  int
+}
+
+func (p *LiteralPacket) TypeId() int {
+	return p.typeId
+}
+
+func NewPacketData(version, typeId int, payload string) *PacketData {
+	return &PacketData{Version: version, TypeId: typeId, Payload: payload}
+}
+
+func ParsePacketData(text string) (*PacketData, error) {
 	var sb strings.Builder
 	for _, r := range text {
 		str, err := toBinaryString(r)
@@ -62,5 +76,44 @@ func ParsePacket(text string) (*Packet, error) {
 		return nil, err
 	}
 
-	return NewPacket(int(version), int(typeId), binary), nil
+	return NewPacketData(int(version), int(typeId), binary), nil
+}
+
+func ParsePacketLiteral(data *PacketData) (*LiteralPacket, error) {
+	runes := []rune(data.Payload)
+	var sb strings.Builder
+
+	for len(runes) >= 5 {
+		var isLast = runes[0] == '0'
+		section := runes[1:5]
+		runes = runes[5:]
+		for _, r := range section {
+			sb.WriteRune(r)
+		}
+
+		if isLast {
+			break
+		}
+	}
+
+	value, err := strconv.ParseInt(sb.String(), 2, 32)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LiteralPacket{typeId: data.TypeId, Value: int(value)}, nil
+}
+
+func ParsePacket(text string) (Packet, error) {
+	data, err := ParsePacketData(text)
+	if err != nil {
+		return nil, err
+	}
+
+	switch data.TypeId {
+	case 4:
+		return ParsePacketLiteral(data)
+	default:
+		return nil, fmt.Errorf("bad typeid: %d", data.TypeId)
+	}
 }

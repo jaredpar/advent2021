@@ -14,7 +14,16 @@ var sampleText string
 var inputText string
 
 func TestSimpleParse(t *testing.T) {
-	packet, _ := ParsePacket("D2FE28")
-	testUtil.AssertEqualInt(t, 6, packet.Version)
-	testUtil.AssertEqualInt(t, 4, packet.TypeId)
+	packet, err := ParsePacket("D2FE28")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	literal, ok := packet.(*LiteralPacket)
+	if !ok {
+		t.Fatal("wrong type")
+	}
+
+	testUtil.AssertEqualInt(t, 4, literal.typeId)
+	testUtil.AssertEqualInt(t, 2021, literal.Value)
 }
