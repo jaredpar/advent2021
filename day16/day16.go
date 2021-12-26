@@ -83,32 +83,38 @@ func ParsePacketData(text string) (*PacketData, error) {
 	return parsePacketDataCore(payload)
 }
 
-const (
-	KindLiteral Kind = iota
-	KindOperator
-)
-
 type Packet interface {
-	Kind() Kind
+	Version() int
+	Children() []Packet
 }
 
 type LiteralPacket struct {
-	Value int
+	version int
+	Value   int
 }
 
-func (p *LiteralPacket) Kind() Kind {
-	return KindLiteral
+func (p *LiteralPacket) Version() int {
+	return p.version
+}
+
+func (p *LiteralPacket) Children() []Packet {
+	return make([]Packet, 0)
 }
 
 type OperatorPacket struct {
-	Children []Packet
+	version  int
+	children []Packet
 }
 
-func (p *OperatorPacket) Kind() Kind {
-	return KindOperator
+func (p *OperatorPacket) Version() int {
+	return p.version
 }
 
-func parseLiteralPacket(payload []rune) (*LiteralPacket, []rune, error) {
+func (p *OperatorPacket) Children() []Packet {
+	return p.children
+}
+
+func parseLiteralPacket(version int, payload []rune) (*LiteralPacket, []rune, error) {
 	parts := make([]rune, 0, len(payload))
 	for len(payload) >= 5 {
 		var isLast = payload[0] == '0'
@@ -125,16 +131,14 @@ func parseLiteralPacket(payload []rune) (*LiteralPacket, []rune, error) {
 		return nil, nil, err
 	}
 
-	return &LiteralPacket{Value: int(value)}, payload, nil
+	return &LiteralPacket{version: version, Value: int(value)}, payload, nil
 }
 
-func parseOperatorPacket(payload []rune) (*OperatorPacket, []rune, error) {
+func parseOperatorPacket(version int, payload []rune) (*OperatorPacket, []rune, error) {
 	if len(payload) < 1 {
 		return nil, nil, fmt.Errorf("bad payload")
 	}
 
-	var children []Packet
-	var remaining []rune
 	if payload[0] == '0' {
 		payload := payload[1:]
 		length, err := parseBinaryInt(payload[:15])
@@ -142,7 +146,7 @@ func parseOperatorPacket(payload []rune) (*OperatorPacket, []rune, error) {
 			return nil, nil, err
 		}
 
-		children = make([]Packet, 0)
+		children := make([]Packet, 0)
 		payload = payload[15:]
 		consumed := 0
 		for {
@@ -155,7 +159,7 @@ func parseOperatorPacket(payload []rune) (*OperatorPacket, []rune, error) {
 			consumed += len(payload) - len(remaining)
 			payload = remaining
 			if consumed >= length {
-				break
+				return &OperatorPacket{children: children, version: version}, remaining, nil
 			}
 		}
 	} else if payload[0] == '1' {
@@ -165,7 +169,7 @@ func parseOperatorPacket(payload []rune) (*OperatorPacket, []rune, error) {
 			return nil, nil, err
 		}
 
-		children = make([]Packet, length)
+		children := make([]Packet, length)
 		payload = payload[11:]
 		for i := 0; i < length; i++ {
 			child, remaining, err := parsePacketCore(payload)
@@ -176,11 +180,10 @@ func parseOperatorPacket(payload []rune) (*OperatorPacket, []rune, error) {
 			children[i] = child
 			payload = remaining
 		}
+		return &OperatorPacket{children: children, version: version}, payload, nil
 	} else {
 		return nil, nil, fmt.Errorf("bad payload kind: %d", payload[0])
 	}
-
-	return &OperatorPacket{Children: children}, remaining, nil
 }
 
 func parsePacketCore(payload []rune) (Packet, []rune, error) {
@@ -192,9 +195,9 @@ func parsePacketCore(payload []rune) (Packet, []rune, error) {
 	payload = data.Payload
 	var packet Packet
 	if data.TypeId == 4 {
-		packet, payload, err = parseLiteralPacket(payload)
+		packet, payload, err = parseLiteralPacket(data.Version, payload)
 	} else {
-		packet, payload, err = parseOperatorPacket(payload)
+		packet, payload, err = parseOperatorPacket(data.Version, payload)
 	}
 
 	return packet, payload, err
@@ -208,4 +211,21 @@ func ParsePacket(text string) (Packet, error) {
 
 	packet, _, err := parsePacketCore(payload)
 	return packet, err
+}
+
+func Part1(text string) (int, error) {
+	packet, err := ParsePacket(text)
+	if err != nil {
+		return 0, err
+	}
+
+	sum := 0
+	toVisit := []Packet{packet}
+	for len(toVisit) > 0 {
+		cur := toVisit[0]
+		sum += cur.Version()
+		toVisit = append(toVisit[1:], cur.Children()...)
+	}
+
+	return sum, nil
 }

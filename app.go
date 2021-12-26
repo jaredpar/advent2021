@@ -18,6 +18,7 @@ import (
 //go:embed day13/*.txt
 //go:embed day14/*.txt
 //go:embed day15/*.txt
+//go:embed day16/*.txt
 var f embed.FS
 
 func runDay15Part1() {
@@ -51,8 +52,17 @@ func runDay15Part2() {
 }
 
 func runDay16Part1() {
-	packet, _ := day16.ParsePacketData("D2FE28")
-	fmt.Println(packet.Payload)
+	lines, err := util.ReadLines(f, "day16/input.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	sum, err := day16.Part1(lines[0])
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("version sum: %d\n", sum)
 }
 
 func main() {
