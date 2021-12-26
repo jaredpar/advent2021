@@ -3,7 +3,6 @@ package day16
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"unicode"
 )
 
@@ -16,19 +15,25 @@ func trimStart(text string, count int) (start, rest string) {
 	return
 }
 
-func toBinaryString(r rune) (string, error) {
-	r = unicode.ToLower(r)
-	value, err := strconv.ParseInt(string(r), 16, 32)
-	if err != nil {
-		return "", err
+func hexToBinaryRunes(hex []rune) ([]rune, error) {
+	binary := make([]rune, 0)
+	for _, r := range hex {
+		r = unicode.ToLower(r)
+		value, err := strconv.ParseInt(string(r), 16, 32)
+		if err != nil {
+			return nil, err
+		}
+
+		str := strconv.FormatInt(value, 2)
+		for len(str) < 4 {
+			str = "0" + str
+		}
+
+		curRunes := []rune(str)
+		binary = append(binary, curRunes...)
 	}
 
-	str := strconv.FormatInt(value, 2)
-	for len(str) < 4 {
-		str = "0" + str
-	}
-
-	return str, nil
+	return binary, nil
 }
 
 func parseBinaryInt(runes []rune) (int, error) {
@@ -49,38 +54,33 @@ func parseBinaryInt(runes []rune) (int, error) {
 type PacketData struct {
 	Version int
 	TypeId  int
-	Payload string
+	Payload []rune
 }
 
-func NewPacketData(version, typeId int, payload string) *PacketData {
+func NewPacketData(version, typeId int, payload []rune) *PacketData {
 	return &PacketData{Version: version, TypeId: typeId, Payload: payload}
 }
 
+func parsePacketDataCore(payload []rune) (*PacketData, error) {
+	version, err := parseBinaryInt(payload[0:3])
+	if err != nil {
+		return nil, err
+	}
+
+	typeId, err := parseBinaryInt(payload[3:6])
+	if err != nil {
+		return nil, err
+	}
+
+	return NewPacketData(int(version), int(typeId), payload[6:]), nil
+}
+
 func ParsePacketData(text string) (*PacketData, error) {
-	var sb strings.Builder
-	for _, r := range text {
-		str, err := toBinaryString(r)
-		if err != nil {
-			return nil, err
-		}
-
-		sb.WriteString(str)
-	}
-
-	binary := sb.String()
-	versionStr, binary := trimStart(binary, 3)
-	version, err := strconv.ParseInt(versionStr, 2, 32)
+	payload, err := hexToBinaryRunes([]rune(text))
 	if err != nil {
 		return nil, err
 	}
-
-	typeIdStr, binary := trimStart(binary, 3)
-	typeId, err := strconv.ParseInt(typeIdStr, 2, 32)
-	if err != nil {
-		return nil, err
-	}
-
-	return NewPacketData(int(version), int(typeId), binary), nil
+	return parsePacketDataCore(payload)
 }
 
 const (
@@ -109,21 +109,18 @@ func (p *OperatorPacket) Kind() Kind {
 }
 
 func parseLiteralPacket(payload []rune) (*LiteralPacket, []rune, error) {
-	var sb strings.Builder
+	parts := make([]rune, 0, len(payload))
 	for len(payload) >= 5 {
 		var isLast = payload[0] == '0'
 		section := payload[1:5]
 		payload = payload[5:]
-		for _, r := range section {
-			sb.WriteRune(r)
-		}
-
+		parts = append(parts, section...)
 		if isLast {
 			break
 		}
 	}
 
-	value, err := strconv.ParseInt(sb.String(), 2, 32)
+	value, err := parseBinaryInt(parts)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -132,51 +129,68 @@ func parseLiteralPacket(payload []rune) (*LiteralPacket, []rune, error) {
 }
 
 func parseOperatorPacket(payload []rune) (*OperatorPacket, []rune, error) {
-	if len(payload) < 16 {
+	if len(payload) < 1 {
 		return nil, nil, fmt.Errorf("bad payload")
 	}
 
-	length, err := parseBinaryInt(payload[:15])
-	if err != nil {
-		return nil, nil, err
-	}
-
-	children := make([]Packet, 0)
-	payload = payload[15:]
-	consumed := 0
-	for {
-		child, remaining, err := parseLiteralPacket(payload)
+	var children []Packet
+	var remaining []rune
+	if payload[0] == '0' {
+		payload := payload[1:]
+		length, err := parseBinaryInt(payload[:15])
 		if err != nil {
 			return nil, nil, err
 		}
 
-		children = append(children, child)
-		consumed += len(payload) - len(remaining)
-		payload = remaining
-		if consumed >= length {
-			break
+		children = make([]Packet, 0)
+		payload = payload[15:]
+		consumed := 0
+		for {
+			child, remaining, err := parsePacketCore(payload)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			children = append(children, child)
+			consumed += len(payload) - len(remaining)
+			payload = remaining
+			if consumed >= length {
+				break
+			}
 		}
+	} else {
+		panic("not implemented")
 	}
 
-	return &OperatorPacket{Children: children}, payload, nil
+	return &OperatorPacket{Children: children}, remaining, nil
 }
 
-func ParsePacket(text string) (Packet, error) {
-	data, err := ParsePacketData(text)
+func parsePacketCore(payload []rune) (Packet, []rune, error) {
+	data, err := parsePacketDataCore(payload)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	payload := []rune(data.Payload)
+	payload = data.Payload
 	var packet Packet
 	switch data.TypeId {
 	case 4:
-		packet, _, err = parseLiteralPacket(payload)
+		packet, payload, err = parseLiteralPacket(payload)
 	case 6:
-		packet, _, err = parseOperatorPacket(payload)
+		packet, payload, err = parseOperatorPacket(payload)
 	default:
 		err = fmt.Errorf("bad typeid: %d", data.TypeId)
 	}
 
+	return packet, payload, err
+}
+
+func ParsePacket(text string) (Packet, error) {
+	payload, err := hexToBinaryRunes([]rune(text))
+	if err != nil {
+		return nil, err
+	}
+
+	packet, _, err := parsePacketCore(payload)
 	return packet, err
 }

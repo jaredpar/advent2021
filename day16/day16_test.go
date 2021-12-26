@@ -28,12 +28,17 @@ func TestSimpleLiteralParse(t *testing.T) {
 }
 
 func TestParseBinaryInt(t *testing.T) {
-	const text = "000000000011011"
-	value, err := parseBinaryInt([]rune(text))
-	if err != nil {
-		t.Fatal(err)
+
+	testCore := func(text string, expected int) {
+		value, err := parseBinaryInt([]rune(text))
+		if err != nil {
+			t.Fatal(err)
+		}
+		testUtil.AssertEqualInt(t, expected, value)
 	}
-	testUtil.AssertEqualInt(t, 27, value)
+
+	testCore("000000000011011", 27)
+	testCore("11", 3)
 }
 
 func TestSimpleOperatorParse1(t *testing.T) {
@@ -46,7 +51,10 @@ func TestSimpleOperatorParse1(t *testing.T) {
 	if !ok {
 		t.Fatal("wrong type")
 	}
-	testUtil.AssertEqualInt(t, 2, len(operator.Children))
+
+	if 2 != len(operator.Children) {
+		t.Fatalf("wrong number of children: %d", len(operator.Children))
+	}
 
 	testVal := func(i, expected int) {
 		literal, ok := operator.Children[i].(*LiteralPacket)
