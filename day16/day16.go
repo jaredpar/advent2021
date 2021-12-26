@@ -9,15 +9,6 @@ import (
 	"advent2021.com/util"
 )
 
-type Kind int
-
-func trimStart(text string, count int) (start, rest string) {
-	runes := []rune(text)
-	start = string(runes[0:count])
-	rest = string(runes[count:])
-	return
-}
-
 func hexToBinaryRunes(hex []rune) ([]rune, error) {
 	binary := make([]rune, 0)
 	for _, r := range hex {
