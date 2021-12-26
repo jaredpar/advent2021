@@ -69,3 +69,32 @@ func TestSimpleOperatorParse1(t *testing.T) {
 	testVal(1, 20)
 
 }
+
+func TestSimpleOperatorParse2(t *testing.T) {
+	packet, err := ParsePacket("EE00D40C823060")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	operator, ok := packet.(*OperatorPacket)
+	if !ok {
+		t.Fatal("wrong type")
+	}
+
+	if 3 != len(operator.Children) {
+		t.Fatalf("wrong number of children: %d", len(operator.Children))
+	}
+
+	testVal := func(i, expected int) {
+		literal, ok := operator.Children[i].(*LiteralPacket)
+		if !ok {
+			t.Fatal("wrong type")
+		}
+
+		testUtil.AssertEqualInt(t, expected, literal.Value)
+	}
+
+	testVal(0, 1)
+	testVal(1, 2)
+	testVal(2, 3)
+}

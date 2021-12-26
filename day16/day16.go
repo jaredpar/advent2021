@@ -158,8 +158,26 @@ func parseOperatorPacket(payload []rune) (*OperatorPacket, []rune, error) {
 				break
 			}
 		}
+	} else if payload[0] == '1' {
+		payload := payload[1:]
+		length, err := parseBinaryInt(payload[:11])
+		if err != nil {
+			return nil, nil, err
+		}
+
+		children = make([]Packet, length)
+		payload = payload[11:]
+		for i := 0; i < length; i++ {
+			child, remaining, err := parsePacketCore(payload)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			children[i] = child
+			payload = remaining
+		}
 	} else {
-		panic("not implemented")
+		return nil, nil, fmt.Errorf("bad payload kind: %d", payload[0])
 	}
 
 	return &OperatorPacket{Children: children}, remaining, nil
@@ -173,13 +191,10 @@ func parsePacketCore(payload []rune) (Packet, []rune, error) {
 
 	payload = data.Payload
 	var packet Packet
-	switch data.TypeId {
-	case 4:
+	if data.TypeId == 4 {
 		packet, payload, err = parseLiteralPacket(payload)
-	case 6:
+	} else {
 		packet, payload, err = parseOperatorPacket(payload)
-	default:
-		err = fmt.Errorf("bad typeid: %d", data.TypeId)
 	}
 
 	return packet, payload, err
