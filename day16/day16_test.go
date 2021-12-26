@@ -57,6 +57,26 @@ func TestPart1(t *testing.T) {
 	testCore("A0016C880162017C3686B18A3D4780", 31)
 }
 
+func TestPart2(t *testing.T) {
+	testCore := func(text string, expected int) {
+		sum, err := Part2(text)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		testUtil.AssertEqualInt(t, expected, sum)
+	}
+
+	testCore("C200B40A82", 3)
+	testCore("04005AC33890", 54)
+	testCore("880086C3E88112", 7)
+	testCore("CE00C43D881120", 9)
+	testCore("D8005AC2A8F0", 1)
+	testCore("F600BC2D8F", 0)
+	testCore("9C005AC2F8F0", 0)
+	testCore("9C0141080250320F1802104A08", 1)
+}
+
 func TestSimpleOperatorParse1(t *testing.T) {
 	packet, err := ParsePacket("38006F45291200")
 	if err != nil {

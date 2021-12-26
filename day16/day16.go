@@ -2,8 +2,11 @@ package day16
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"unicode"
+
+	"advent2021.com/util"
 )
 
 type Kind int
@@ -86,6 +89,7 @@ func ParsePacketData(text string) (*PacketData, error) {
 type Packet interface {
 	Version() int
 	Children() []Packet
+	Evaluate() int
 }
 
 type LiteralPacket struct {
@@ -101,8 +105,13 @@ func (p *LiteralPacket) Children() []Packet {
 	return make([]Packet, 0)
 }
 
+func (p *LiteralPacket) Evaluate() int {
+	return p.Value
+}
+
 type OperatorPacket struct {
 	version  int
+	typeId   int
 	children []Packet
 }
 
@@ -112,6 +121,59 @@ func (p *OperatorPacket) Version() int {
 
 func (p *OperatorPacket) Children() []Packet {
 	return p.children
+}
+
+func (p *OperatorPacket) Evaluate() int {
+	switch p.typeId {
+	case 0:
+		sum := 0
+		for _, c := range p.children {
+			sum += c.Evaluate()
+		}
+		return sum
+	case 1:
+		if len(p.children) == 0 {
+			return 0
+		}
+
+		sum := 1
+		for _, c := range p.children {
+			sum *= c.Evaluate()
+		}
+		return sum
+	case 2:
+		min := math.MaxInt
+		for _, c := range p.children {
+			min = util.Min(min, c.Evaluate())
+		}
+		return min
+	case 3:
+		max := math.MinInt
+		for _, c := range p.children {
+			max = util.Max(max, c.Evaluate())
+		}
+		return max
+	case 5:
+		if p.children[0].Evaluate() > p.children[1].Evaluate() {
+			return 1
+		} else {
+			return 0
+		}
+	case 6:
+		if p.children[0].Evaluate() < p.children[1].Evaluate() {
+			return 1
+		} else {
+			return 0
+		}
+	case 7:
+		if p.children[0].Evaluate() == p.children[1].Evaluate() {
+			return 1
+		} else {
+			return 0
+		}
+	default:
+		panic(fmt.Sprintf("bad type id: %d", p.typeId))
+	}
 }
 
 func parseLiteralPacket(version int, payload []rune) (*LiteralPacket, []rune, error) {
@@ -134,7 +196,7 @@ func parseLiteralPacket(version int, payload []rune) (*LiteralPacket, []rune, er
 	return &LiteralPacket{version: version, Value: int(value)}, payload, nil
 }
 
-func parseOperatorPacket(version int, payload []rune) (*OperatorPacket, []rune, error) {
+func parseOperatorPacket(version int, typeId int, payload []rune) (*OperatorPacket, []rune, error) {
 	if len(payload) < 1 {
 		return nil, nil, fmt.Errorf("bad payload")
 	}
@@ -159,7 +221,7 @@ func parseOperatorPacket(version int, payload []rune) (*OperatorPacket, []rune, 
 			consumed += len(payload) - len(remaining)
 			payload = remaining
 			if consumed >= length {
-				return &OperatorPacket{children: children, version: version}, remaining, nil
+				return &OperatorPacket{children: children, version: version, typeId: typeId}, remaining, nil
 			}
 		}
 	} else if payload[0] == '1' {
@@ -180,7 +242,7 @@ func parseOperatorPacket(version int, payload []rune) (*OperatorPacket, []rune, 
 			children[i] = child
 			payload = remaining
 		}
-		return &OperatorPacket{children: children, version: version}, payload, nil
+		return &OperatorPacket{children: children, version: version, typeId: typeId}, payload, nil
 	} else {
 		return nil, nil, fmt.Errorf("bad payload kind: %d", payload[0])
 	}
@@ -197,7 +259,7 @@ func parsePacketCore(payload []rune) (Packet, []rune, error) {
 	if data.TypeId == 4 {
 		packet, payload, err = parseLiteralPacket(data.Version, payload)
 	} else {
-		packet, payload, err = parseOperatorPacket(data.Version, payload)
+		packet, payload, err = parseOperatorPacket(data.Version, data.TypeId, payload)
 	}
 
 	return packet, payload, err
@@ -228,4 +290,13 @@ func Part1(text string) (int, error) {
 	}
 
 	return sum, nil
+}
+
+func Part2(text string) (int, error) {
+	packet, err := ParsePacket(text)
+	if err != nil {
+		return 0, err
+	}
+
+	return packet.Evaluate(), nil
 }

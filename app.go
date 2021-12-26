@@ -65,6 +65,20 @@ func runDay16Part1() {
 	fmt.Printf("version sum: %d\n", sum)
 }
 
+func runDay16Part2() {
+	lines, err := util.ReadLines(f, "day16/input.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	result, err := day16.Part2(lines[0])
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("result: %d\n", result)
+}
+
 func main() {
-	runDay16Part1()
+	runDay16Part2()
 }
