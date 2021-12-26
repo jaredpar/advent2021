@@ -51,7 +51,7 @@ func runDay15Part2() {
 }
 
 func runDay16Part1() {
-	packet, _ := day16.ParsePacket("D2FE28")
+	packet, _ := day16.ParsePacketData("D2FE28")
 	fmt.Println(packet.Payload)
 }
 
