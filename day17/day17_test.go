@@ -15,6 +15,11 @@ func mustParse(t *testing.T, line string) *TargetArea {
 	return ta
 }
 
+func TestInRange(t *testing.T) {
+	testUtil.Assert(t, inRange(-7, -10, -5))
+	testUtil.Assert(t, !inRange(0, -10, -5))
+}
+
 func TestParseTargetArea(t *testing.T) {
 	testCore := func(line string, minX, maxX, minY, maxY int) {
 		ta, err := ParseTargetArea(line)
@@ -40,5 +45,5 @@ func TestSimpleHit(t *testing.T) {
 }
 
 func TestPart1(t *testing.T) {
-	testUtil.AssertEqualInt(t, 9, Part1("target area: x=20..30, y=-10..-5"))
+	testUtil.AssertEqualInt(t, 45, Part1("target area: x=20..30, y=-10..-5"))
 }

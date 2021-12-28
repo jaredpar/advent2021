@@ -2,7 +2,6 @@ package day17
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 
@@ -39,15 +38,25 @@ func ParseTargetArea(line string) (*TargetArea, error) {
 }
 
 func inRange(val, min, max int) bool {
-	return val >= min && val <= max
+	if min >= 0 && max >= 0 {
+		return val >= min && val <= max
+	} else if min >= 0 {
+		panic("weird")
+	} else {
+		if val >= 0 {
+			return false
+		}
+
+		return val >= min && val <= max
+	}
 }
 
 func (ta *TargetArea) InTargetAreaX(x int) bool {
 	return inRange(x, ta.MinX, ta.MaxX)
 }
 
-func (ta *TargetArea) InTargetAreaY(x int) bool {
-	return inRange(x, ta.MinY, ta.MaxY)
+func (ta *TargetArea) InTargetAreaY(y int) bool {
+	return inRange(y, ta.MinY, ta.MaxY)
 }
 
 func (ta *TargetArea) InTargetArea(x, y int) bool {
@@ -67,11 +76,11 @@ func (ta *TargetArea) IsHit(x, y int) bool {
 			return true
 		}
 
-		if curX == 0 && (curX < ta.MinX || curX > ta.MaxX) {
+		if x == 0 && (curX < ta.MinX || curX > ta.MaxX) {
 			return false
 		}
 
-		if curY <= 0 && curY < ta.MinY {
+		if y < 0 && curY < ta.MaxY {
 			return false
 		}
 
@@ -126,24 +135,15 @@ func Part1(line string) int {
 
 	maxY := 0
 	for _, x := range getValidX() {
-		fmt.Printf("trying x: %d\n", x)
-
-		// Try y values until we find the max
-		y := 0
-		foundHit := false
-		for {
-			if ta.IsHit(x, y+1) {
-				fmt.Printf("(%d, %d)\n", x, y)
-				foundHit = true
-			} else if foundHit {
-				break
+		// This is a really brute force method. There is a way to constrain the set
+		// of possible 'y' values that I am missing
+		for y := 0; y < 1000; y++ {
+			if ta.IsHit(x, y) {
+				// fmt.Printf("(%d, %d)\n", x, y)
+				maxY = util.Max(maxY, y)
 			}
-
-			y++
 		}
-
-		maxY = util.Max(y, maxY)
 	}
 
-	return maxY
+	return sumRange(maxY)
 }
