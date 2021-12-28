@@ -33,27 +33,28 @@ func (n *Node) Explode() {
 
 	left := n.Left.Value
 	right := n.Right.Value
+	n.Value = 0
 	n.Left = nil
 	n.Right = nil
 
 	// Fix up the left node
 	if n.Parent.Left != nil && n.Parent.Left != n {
 		cur := n.Parent.Left
-		for !cur.IsPair() {
+		for !cur.IsLeaf() {
 			cur = cur.Right
 		}
 
-		cur.Right.Value += left
+		cur.Value += left
 	}
 
 	// Fix up the right node
 	if n.Parent.Right != nil && n.Parent.Right != n {
 		cur := n.Parent.Right
-		for !cur.IsPair() {
+		for !cur.IsLeaf() {
 			cur = cur.Left
 		}
 
-		cur.Left.Value += right
+		cur.Value += right
 	}
 
 	util.Assert(n.IsLeaf())
@@ -77,6 +78,29 @@ func (n *Node) String() string {
 	}
 	impl(n)
 	return sb.String()
+}
+
+func (n *Node) Find(predicate func(*Node) bool) *Node {
+	toVisit := []*Node{n}
+	for len(toVisit) > 0 {
+		lastIndex := len(toVisit) - 1
+		last := toVisit[lastIndex]
+		toVisit = toVisit[:lastIndex]
+
+		if predicate(last) {
+			return last
+		}
+
+		if last.Left != nil {
+			toVisit = append(toVisit, last.Left)
+		}
+
+		if last.Right != nil {
+			toVisit = append(toVisit, last.Right)
+		}
+	}
+
+	return nil
 }
 
 func ParseNode(text string) (*Node, error) {
@@ -126,4 +150,13 @@ func ParseNode(text string) (*Node, error) {
 	}
 
 	return impl(nil)
+}
+
+func MustParseNode(text string) *Node {
+	node, err := ParseNode(text)
+	if err != nil {
+		panic(err)
+	}
+
+	return node
 }
