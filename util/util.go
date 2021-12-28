@@ -37,6 +37,15 @@ func ReadLines(f embed.FS, name string) ([]string, error) {
 	return lines, nil
 }
 
+func MustReadLines(f embed.FS, name string) []string {
+	lines, err := ReadLines(f, name)
+	if err != nil {
+		panic(err)
+	}
+
+	return lines
+}
+
 func ReadLinesAsInt(f embed.FS, name string) ([]int, error) {
 	lines, err := ReadLines(f, name)
 	if err != nil {

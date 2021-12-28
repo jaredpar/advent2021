@@ -37,5 +37,8 @@ func TestSimpleHit(t *testing.T) {
 	testUtil.Assert(t, ta.IsHit(7, 2))
 	testUtil.Assert(t, ta.IsHit(6, 3))
 	testUtil.Assert(t, !ta.IsHit(17, -4))
+}
 
+func TestPart1(t *testing.T) {
+	testUtil.AssertEqualInt(t, 9, Part1("target area: x=20..30, y=-10..-5"))
 }

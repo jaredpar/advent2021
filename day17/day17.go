@@ -2,8 +2,11 @@ package day17
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
+
+	"advent2021.com/util"
 )
 
 type TargetArea struct {
@@ -35,11 +38,20 @@ func ParseTargetArea(line string) (*TargetArea, error) {
 	return NewTargetArea(nums[0], nums[1], nums[2], nums[3]), nil
 }
 
+func inRange(val, min, max int) bool {
+	return val >= min && val <= max
+}
+
+func (ta *TargetArea) InTargetAreaX(x int) bool {
+	return inRange(x, ta.MinX, ta.MaxX)
+}
+
+func (ta *TargetArea) InTargetAreaY(x int) bool {
+	return inRange(x, ta.MinY, ta.MaxY)
+}
+
 func (ta *TargetArea) InTargetArea(x, y int) bool {
-	return x >= ta.MinX &&
-		x <= ta.MaxX &&
-		y >= ta.MinY &&
-		y <= ta.MaxY
+	return ta.InTargetAreaX(x) && ta.InTargetAreaY(y)
 }
 
 // Given an initial starting position of (x, y) will it hit the target area?
@@ -50,6 +62,7 @@ func (ta *TargetArea) IsHit(x, y int) bool {
 	for {
 		curX += x
 		curY += y
+		// fmt.Printf("(%d, %d) -> x = %d y = %d\n", curX, curY, x, y)
 		if ta.InTargetArea(curX, curY) {
 			return true
 		}
@@ -70,4 +83,67 @@ func (ta *TargetArea) IsHit(x, y int) bool {
 
 		y--
 	}
+}
+
+func sumRange(max int) int {
+	val := 0
+	for true {
+		val += max
+		max--
+		if max == 0 {
+			break
+		}
+	}
+
+	return val
+}
+
+func Part1(line string) int {
+	ta, err := ParseTargetArea(line)
+	if err != nil {
+		panic(err)
+	}
+
+	getValidX := func() []int {
+		values := make([]int, 0)
+
+		x := 0
+		foundHit := false
+		for {
+			if ta.InTargetAreaX(sumRange(x + 1)) {
+				x++
+				foundHit = true
+				values = append(values, x)
+			} else if foundHit {
+				break
+			} else {
+				x++
+			}
+		}
+
+		return values
+	}
+
+	maxY := 0
+	for _, x := range getValidX() {
+		fmt.Printf("trying x: %d\n", x)
+
+		// Try y values until we find the max
+		y := 0
+		foundHit := false
+		for {
+			if ta.IsHit(x, y+1) {
+				fmt.Printf("(%d, %d)\n", x, y)
+				foundHit = true
+			} else if foundHit {
+				break
+			}
+
+			y++
+		}
+
+		maxY = util.Max(y, maxY)
+	}
+
+	return maxY
 }
