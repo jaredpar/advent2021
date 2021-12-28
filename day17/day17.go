@@ -2,6 +2,7 @@ package day17
 
 import (
 	"errors"
+	"math"
 	"regexp"
 	"strconv"
 
@@ -80,7 +81,7 @@ func (ta *TargetArea) IsHit(x, y int) bool {
 			return false
 		}
 
-		if y < 0 && curY < ta.MaxY {
+		if y < 0 && curY < ta.MinY {
 			return false
 		}
 
@@ -92,6 +93,35 @@ func (ta *TargetArea) IsHit(x, y int) bool {
 
 		y--
 	}
+}
+
+// Get the set of X velocities that will eventually cross into the target space
+func (ta *TargetArea) GetValidX() []int {
+	values := make([]int, 0)
+
+	for x := 1; x < ta.MinX; x++ {
+		pos := x
+		step := x - 1
+		for {
+			if ta.InTargetAreaX(pos) {
+				values = append(values, x)
+				break
+			}
+
+			if step == 0 || pos > ta.MaxX {
+				break
+			}
+
+			pos += step
+			step--
+		}
+	}
+
+	for x := ta.MinX; x <= ta.MaxX; x++ {
+		values = append(values, x)
+	}
+
+	return values
 }
 
 func sumRange(max int) int {
@@ -107,43 +137,35 @@ func sumRange(max int) int {
 	return val
 }
 
-func Part1(line string) int {
+func PartBoth(line string) (maxY int, distinct int) {
 	ta, err := ParseTargetArea(line)
 	if err != nil {
 		panic(err)
 	}
 
-	getValidX := func() []int {
-		values := make([]int, 0)
-
-		x := 0
-		foundHit := false
-		for {
-			if ta.InTargetAreaX(sumRange(x + 1)) {
-				x++
-				foundHit = true
-				values = append(values, x)
-			} else if foundHit {
-				break
-			} else {
-				x++
-			}
-		}
-
-		return values
-	}
-
-	maxY := 0
-	for _, x := range getValidX() {
+	maxY = math.MinInt
+	distinct = 0
+	for _, x := range ta.GetValidX() {
 		// This is a really brute force method. There is a way to constrain the set
 		// of possible 'y' values that I am missing
-		for y := 0; y < 1000; y++ {
+		for y := util.Min(0, ta.MinY); y < 2000; y++ {
 			if ta.IsHit(x, y) {
-				// fmt.Printf("(%d, %d)\n", x, y)
+				//fmt.Printf("(%d, %d)\n", x, y)
 				maxY = util.Max(maxY, y)
+				distinct++
 			}
 		}
 	}
 
+	return maxY, distinct
+}
+
+func Part1(line string) int {
+	maxY, _ := PartBoth(line)
 	return sumRange(maxY)
+}
+
+func Part2(line string) int {
+	_, distinct := PartBoth(line)
+	return distinct
 }

@@ -41,9 +41,17 @@ func TestSimpleHit(t *testing.T) {
 	ta := mustParse(t, "target area: x=20..30, y=-10..-5")
 	testUtil.Assert(t, ta.IsHit(7, 2))
 	testUtil.Assert(t, ta.IsHit(6, 3))
+	testUtil.Assert(t, ta.IsHit(20, -10))
+	testUtil.Assert(t, ta.IsHit(20, -5))
+	testUtil.Assert(t, ta.IsHit(30, -10))
+	testUtil.Assert(t, ta.IsHit(30, -5))
 	testUtil.Assert(t, !ta.IsHit(17, -4))
 }
 
 func TestPart1(t *testing.T) {
 	testUtil.AssertEqualInt(t, 45, Part1("target area: x=20..30, y=-10..-5"))
+}
+
+func TestPart2(t *testing.T) {
+	testUtil.AssertEqualInt(t, 112, Part2("target area: x=20..30, y=-10..-5"))
 }
