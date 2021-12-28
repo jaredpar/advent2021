@@ -60,6 +60,15 @@ func (n *Node) Explode() {
 	util.Assert(n.IsLeaf())
 }
 
+func (n *Node) Split() {
+	util.Assert(n.IsLeaf())
+
+	extra := n.Value % 2
+	n.Left = NewNode((n.Value-extra)/2, n)
+	n.Right = NewNode(((n.Value-extra)/2)+extra, n)
+	n.Value = -1
+}
+
 func (n *Node) String() string {
 	var sb strings.Builder
 	var impl func(*Node)

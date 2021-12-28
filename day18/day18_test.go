@@ -40,3 +40,13 @@ func TestExplode(t *testing.T) {
 	target.Parent.Explode()
 	testUtil.AssertEqualString(t, "[7,[6,[5,[7,0]]]]", node.String())
 }
+
+func TestSplit(t *testing.T) {
+	node := MustParseNode("7")
+	node.Split()
+	testUtil.AssertEqualString(t, "[3,4]", node.String())
+
+	node = MustParseNode("6")
+	node.Split()
+	testUtil.AssertEqualString(t, "[3,3]", node.String())
+}
