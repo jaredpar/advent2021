@@ -38,23 +38,46 @@ func (n *Node) Explode() {
 	n.Right = nil
 
 	// Fix up the left node
-	if n.Parent.Left != nil && n.Parent.Left != n {
-		cur := n.Parent.Left
-		for !cur.IsLeaf() {
-			cur = cur.Right
+	leftSib := func() *Node {
+		cur := n
+		for cur != nil {
+			if cur.Parent != nil && cur.Parent.Left != cur {
+				cur = cur.Parent.Left
+				for !cur.IsLeaf() {
+					cur = cur.Right
+				}
+				return cur
+			}
+
+			cur = cur.Parent
 		}
 
-		cur.Value += left
+		return nil
+	}()
+
+	if leftSib != nil {
+		leftSib.Value += left
 	}
 
-	// Fix up the right node
-	if n.Parent.Right != nil && n.Parent.Right != n {
-		cur := n.Parent.Right
-		for !cur.IsLeaf() {
-			cur = cur.Left
+	rightSib := func() *Node {
+		cur := n
+		for cur != nil {
+			if cur.Parent != nil && cur.Parent.Right != cur {
+				cur = cur.Parent.Right
+				for !cur.IsLeaf() {
+					cur = cur.Left
+				}
+				return cur
+			}
+
+			cur = cur.Parent
 		}
 
-		cur.Value += right
+		return nil
+	}()
+
+	if rightSib != nil {
+		rightSib.Value += right
 	}
 
 	util.Assert(n.IsLeaf())
@@ -67,6 +90,44 @@ func (n *Node) Split() {
 	n.Left = NewNode((n.Value-extra)/2, n)
 	n.Right = NewNode(((n.Value-extra)/2)+extra, n)
 	n.Value = -1
+}
+
+func (n *Node) Reduce() {
+
+	reduceOne := func() bool {
+		explode := n.Find(func(n *Node) bool {
+			return n.IsPair() && n.Depth() >= 4
+		})
+
+		if explode != nil {
+			explode.Explode()
+			return true
+		}
+
+		split := n.Find(func(n *Node) bool {
+			return n.Value > 9
+		})
+
+		if split != nil {
+			split.Split()
+			return true
+		}
+
+		return false
+	}
+
+	for reduceOne() {
+		// fmt.Println(n.String())
+	}
+}
+
+func (n *Node) Join(other *Node) *Node {
+	p := NewNode(-1, nil)
+	p.Left = n
+	p.Right = other
+
+	p.Reduce()
+	return p
 }
 
 func (n *Node) String() string {
@@ -89,23 +150,33 @@ func (n *Node) String() string {
 	return sb.String()
 }
 
+func (n *Node) Depth() int {
+	depth := 0
+	cur := n
+	for !cur.IsRoot() {
+		depth++
+		cur = cur.Parent
+	}
+
+	return depth
+}
+
 func (n *Node) Find(predicate func(*Node) bool) *Node {
 	toVisit := []*Node{n}
 	for len(toVisit) > 0 {
-		lastIndex := len(toVisit) - 1
-		last := toVisit[lastIndex]
-		toVisit = toVisit[:lastIndex]
+		next := toVisit[0]
+		toVisit = toVisit[1:]
 
-		if predicate(last) {
-			return last
+		if predicate(next) {
+			return next
 		}
 
-		if last.Left != nil {
-			toVisit = append(toVisit, last.Left)
+		if next.Left != nil {
+			toVisit = append(toVisit, next.Left)
 		}
 
-		if last.Right != nil {
-			toVisit = append(toVisit, last.Right)
+		if next.Right != nil {
+			toVisit = append(toVisit, next.Right)
 		}
 	}
 

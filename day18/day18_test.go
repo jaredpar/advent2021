@@ -50,3 +50,13 @@ func TestSplit(t *testing.T) {
 	node.Split()
 	testUtil.AssertEqualString(t, "[3,3]", node.String())
 }
+
+func TestReduce(t *testing.T) {
+	testCore := func(original, expected string) {
+		node := MustParseNode(original)
+		node.Reduce()
+		testUtil.AssertEqualString(t, expected, node.String())
+	}
+
+	testCore("[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]", "[[[[0,7],4],[[7,8],[6,0]]],[8,1]]")
+}
