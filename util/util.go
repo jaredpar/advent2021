@@ -133,6 +133,16 @@ func RuneToInt(r rune) (int, error) {
 	return value, errors.New("invalid value")
 }
 
+// Convert a rune value between '0' and '9' to a int value
+func ByteToInt(b byte) (int, error) {
+	value := int(b - '0')
+	if value >= 0 && value <= 9 {
+		return value, nil
+	}
+
+	return value, errors.New("invalid value")
+}
+
 // Return the first rune in the string. Will panic on a zero length string
 func FirstRune(text string) rune {
 	for _, r := range text {
@@ -174,6 +184,7 @@ func Abs(x int) int {
 	return x
 }
 
+// TODO: should be require
 func Assert(cond bool) {
 	if !cond {
 		panic("failed assert")
