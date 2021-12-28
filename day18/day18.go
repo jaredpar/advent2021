@@ -124,7 +124,9 @@ func (n *Node) Reduce() {
 func (n *Node) Join(other *Node) *Node {
 	p := NewNode(-1, nil)
 	p.Left = n
+	n.Parent = p
 	p.Right = other
+	other.Parent = p
 
 	p.Reduce()
 	return p
@@ -239,4 +241,30 @@ func MustParseNode(text string) *Node {
 	}
 
 	return node
+}
+
+func magnitude(n *Node) int {
+	if n.IsLeaf() {
+		return n.Value
+	} else {
+		left := 3 * magnitude(n.Left)
+		right := 2 * magnitude(n.Right)
+		return left + right
+	}
+}
+
+func Part1(lines []string) int {
+	var node *Node
+	for _, line := range lines {
+		cur := MustParseNode(line)
+		if node == nil {
+			node = cur
+		} else {
+			node = node.Join(cur)
+		}
+
+		fmt.Println(node.String())
+	}
+
+	return magnitude(node)
 }

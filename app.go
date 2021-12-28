@@ -7,20 +7,11 @@ import (
 	"advent2021.com/day15"
 	"advent2021.com/day16"
 	"advent2021.com/day17"
+	"advent2021.com/day18"
 	"advent2021.com/util"
 )
 
-//go:embed day07/*.txt
-//go:embed day08/*.txt
-//go:embed day09/*.txt
-//go:embed day10/*.txt
-//go:embed day11/*.txt
-//go:embed day12/*.txt
-//go:embed day13/*.txt
-//go:embed day14/*.txt
-//go:embed day15/*.txt
-//go:embed day16/*.txt
-//go:embed day17/*.txt
+//go:embed **/*.txt
 var f embed.FS
 
 func runDay15Part1() {
@@ -93,6 +84,12 @@ func runDay17Part2() {
 	fmt.Printf("result: %d\n", result)
 }
 
+func runDay18Part1() {
+	lines := util.MustReadLines(f, "day18/sample.txt")
+	result := day18.Part1(lines)
+	fmt.Printf("result: %d\n", result)
+}
+
 func main() {
-	runDay17Part2()
+	runDay18Part1()
 }
