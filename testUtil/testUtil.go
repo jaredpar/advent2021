@@ -22,6 +22,12 @@ func AssertEqualString(t *testing.T, expected, actual string) {
 	}
 }
 
+func Assert(t *testing.T, cond bool) {
+	if !cond {
+		t.Error("expected true")
+	}
+}
+
 func AssertNotError(t *testing.T, err error) {
 	if err != nil {
 		t.Error(err)
