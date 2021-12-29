@@ -93,7 +93,7 @@ func (n *Node) Split() {
 func (n *Node) Reduce() {
 
 	reduceOne := func() bool {
-		explode := n.FindBfs(func(n *Node) bool {
+		explode := n.FindDfs(func(n *Node) bool {
 			return n.IsPair() && n.Depth() >= 4
 		})
 
@@ -102,7 +102,7 @@ func (n *Node) Reduce() {
 			return true
 		}
 
-		split := n.FindBfs(func(n *Node) bool {
+		split := n.FindDfs(func(n *Node) bool {
 			return n.Value > 9
 		})
 

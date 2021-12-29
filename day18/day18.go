@@ -1,9 +1,5 @@
 package day18
 
-import (
-	"fmt"
-)
-
 func magnitude(n *Node) int {
 	if n.IsLeaf() {
 		return n.Value
@@ -24,7 +20,7 @@ func joinLines(lines []string) *Node {
 			node = node.Join(cur)
 		}
 
-		fmt.Println(node.String())
+		// fmt.Println(node.String())
 	}
 
 	return node

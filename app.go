@@ -85,7 +85,7 @@ func runDay17Part2() {
 }
 
 func runDay18Part1() {
-	lines := util.MustReadLines(f, "day18/sample.txt")
+	lines := util.MustReadLines(f, "day18/input.txt")
 	result := day18.Part1(lines)
 	fmt.Printf("result: %d\n", result)
 }
