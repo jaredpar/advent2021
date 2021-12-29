@@ -51,7 +51,7 @@ func (n *Node) GetRoot() *Node {
 }
 
 func (n *Node) Explode() {
-	util.Assert(n.IsPair())
+	util.Require(n.IsPair())
 
 	left := n.Left.Value
 	right := n.Right.Value
@@ -78,11 +78,11 @@ func (n *Node) Explode() {
 		leafs[leafIndex+1].Value += right
 	}
 
-	util.Assert(n.IsLeaf())
+	util.Require(n.IsLeaf())
 }
 
 func (n *Node) Split() {
-	util.Assert(n.IsLeaf())
+	util.Require(n.IsLeaf())
 
 	extra := n.Value % 2
 	n.Left = NewNode((n.Value-extra)/2, n)

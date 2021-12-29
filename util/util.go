@@ -184,8 +184,7 @@ func Abs(x int) int {
 	return x
 }
 
-// TODO: should be require
-func Assert(cond bool) {
+func Require(cond bool) {
 	if !cond {
 		panic("failed assert")
 	}

@@ -124,7 +124,7 @@ func Part1(cs *CaveSystem) []string {
 		if len(path) > 0 {
 			path = path + "," + c.Label
 		} else {
-			util.Assert(c.Label == labelStart)
+			util.Require(c.Label == labelStart)
 			path = c.Label
 		}
 
@@ -164,7 +164,7 @@ func Part2(cs *CaveSystem) []string {
 		if len(path) > 0 {
 			path = path + "," + c.Label
 		} else {
-			util.Assert(c.Label == labelStart)
+			util.Require(c.Label == labelStart)
 			path = c.Label
 		}
 

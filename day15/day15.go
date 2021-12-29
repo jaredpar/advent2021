@@ -79,7 +79,7 @@ func shortestPath(grid *util.Grid) int {
 		doneMap[index] = true
 
 		distance := distances[index]
-		util.Assert(distance >= 0)
+		util.Require(distance >= 0)
 		if index == endIndex {
 			return distance
 		}
