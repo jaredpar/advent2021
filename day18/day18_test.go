@@ -113,3 +113,11 @@ func TestJoinLines(t *testing.T) {
 	node := joinLines(lines)
 	testUtil.AssertEqualString(t, "[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]", node.String())
 }
+
+func TestPart2SampleCase(t *testing.T) {
+	left := MustParseNode("[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]")
+	right := MustParseNode("[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]")
+	join := left.Join(right)
+	testUtil.AssertEqualString(t, "[[[[7,8],[6,6]],[[6,0],[7,7]]],[[[7,8],[8,8]],[[7,9],[0,6]]]]", join.String())
+	testUtil.AssertEqualInt(t, 3993, magnitude(join))
+}

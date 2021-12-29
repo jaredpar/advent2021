@@ -1,5 +1,11 @@
 package day18
 
+import (
+	"math"
+
+	"advent2021.com/util"
+)
+
 func magnitude(n *Node) int {
 	if n.IsLeaf() {
 		return n.Value
@@ -29,4 +35,17 @@ func joinLines(lines []string) *Node {
 func Part1(lines []string) int {
 	node := joinLines(lines)
 	return magnitude(node)
+}
+
+func Part2(lines []string) int {
+	max := math.MinInt
+	for x := 0; x < len(lines); x++ {
+		for y := 0; y < len(lines); y++ {
+			left := MustParseNode(lines[x])
+			right := MustParseNode(lines[y])
+			magnitude := magnitude(left.Join(right))
+			max = util.Max(max, magnitude)
+		}
+	}
+	return max
 }
