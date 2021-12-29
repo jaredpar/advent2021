@@ -135,9 +135,9 @@ func (n *Node) String() string {
 	var impl func(*Node)
 	impl = func(cur *Node) {
 		if cur.IsLeaf() {
-			sb.WriteString(fmt.Sprintf("%d", cur.Value))
+			fmt.Fprintf(&sb, "%d", cur.Value)
 		} else if cur.IsPair() {
-			sb.WriteString(fmt.Sprintf("[%d,%d]", cur.Left.Value, cur.Right.Value))
+			fmt.Fprintf(&sb, "[%d,%d]", cur.Left.Value, cur.Right.Value)
 		} else {
 			sb.WriteString("[")
 			impl(cur.Left)
